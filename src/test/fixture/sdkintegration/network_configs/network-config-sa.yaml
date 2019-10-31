@@ -1,0 +1,136 @@
+---
+
+name: "Network-Config-Test"
+
+x-type: "hlfv1"
+description: "The network used in the integration tests"
+version: 1.0.0
+
+client:
+  organization: Org1
+  credentialStore:
+    path: "/tmp/hfc-kvs"
+    cryptoStore:
+      path: "/tmp/hfc-cvs"
+    wallet: wallet-name
+
+channels:
+  mychannel:
+    orderers:
+      - orderer.esunego.com
+    peers:
+      peer0.org1.esunego.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer1.org1.esunego.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org2.esunego.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer1.org2.esunego.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+        
+    chaincodes:
+      - example02:v1
+      - marbles:1.0
+
+organizations:
+  Org1:
+    mspid: Org1MSP
+    peers:
+      - peer0.org1.esunego.com
+      - peer1.org1.esunego.com
+    certificateAuthorities:
+      - ca-org1
+    adminPrivateKey:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/peerOrganizations/org1.esunego.com/users/Admin@org1.esunego.com/msp/keystore/05d3de06307b06d084d0eb5fbbaa54b197120b8311d1aeef858a08866bbe7b47_sk
+    signedCert:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/peerOrganizations/org1.esunego.com/users/Admin@org1.esunego.com/msp/signcerts/Admin@org1.esunego.com-cert.pem
+  Org2:
+    mspid: Org2MSP
+    peers:
+      - peer0.org2.esunego.com
+      - peer1.org2.esunego.com
+    certificateAuthorities:
+          - ca-org2
+orderers:
+  orderer.esunego.com:
+    url: grpc://139.9.120.244:7050
+    grpcOptions:
+      grpc-max-send-message-length: 15
+      grpc.keepalive_time_ms: 360000
+      grpc.keepalive_timeout_ms: 180000
+    tlsCACerts:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/ordererOrganizations/esunego.com/tlsca/e6a8544e71dc540848a252ae88c33b0bdcc362f4c40f5665f4eabfc8f7882bea_sk
+
+
+peers:
+  peer0.org1.esunego.com:
+    url: grpc://139.9.120.244:7051
+    grpcOptions:
+      grpc.http2.keepalive_time: 15
+    tlsCACerts:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/peerOrganizations/org1.esunego.com/peers/peer0.org1.esunego.com/tls/server.crt
+  peer1.org1.esunego.com:
+    url: grpc://139.9.120.244:8051
+    grpcOptions:
+      grpc.http2.keepalive_time: 15
+    tlsCACerts:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/peerOrganizations/org1.esunego.com/peers/peer1.org1.esunego.com/tls/server.crt
+  peer0.org2.esunego.com:
+    url: grpc://139.9.120.244:9051
+    tlsCACerts:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/peerOrganizations/org2.esunego.com/peers/peer0.org2.esunego.com/tls/server.crt
+  peer1.org2.esunego.com:
+    url: grpc://139.9.120.244:10051
+    tlsCACerts:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/peerOrganizations/org2.esunego.com/peers/peer1.org2.esunego.com/tls/server.crt
+
+#
+# Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
+# certificate management to be done via REST APIs. Application may choose to use a standard
+# Certificate Authority instead of Fabric-CA, in which case this section would not be specified.
+#
+certificateAuthorities:
+  ca-org1:
+    url: http://139.9.120.244:7054
+    # the properties specified under this object are passed to the 'http' client verbatim when
+    # making the request to the Fabric-CA server
+#    httpOptions:
+#      verify: true
+    tlsCACerts:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/peerOrganizations/org1.esunego.com/ca/ca.org1.esunego.com-cert.pem
+    # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
+    # needed to enroll and invoke new users.
+    registrar: #single entitiy
+      enrollId: admin
+      enrollSecret: adminpw
+    # [Optional] The optional name of the CA.
+    caName: ca-org1
+  ca-org2:
+    url: http://139.9.120.244:8054
+      # the properties specified under this object are passed to the 'http' client verbatim when
+      # making the request to the Fabric-CA server
+    httpOptions:
+      verify: true
+    tlsCACerts:
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/huawei/crypto-config/peerOrganizations/org2.esunego.com/ca/ca.org2.esunego.com-cert.pem
+
+    # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
+    # needed to enroll and invoke new users.
+    registrar: # as an array.
+      -  enrollId: admin
+         enrollSecret: adminpw
+      # [Optional] The optional name of the CA.
+            ## caName: ca0 no ca name!
+

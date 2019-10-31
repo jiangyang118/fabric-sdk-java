@@ -180,7 +180,8 @@ organizations:
 #
 orderers:
   orderer.example.com:
-    url: grpc://localhost:7050
+    url: grpc://139.9.120.244:7050
+
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -193,6 +194,7 @@ orderers:
       grpc.keepalive_time_ms: 360000
       grpc.keepalive_timeout_ms: 180000
       grpc.keepalive_without_calls: true
+
 
     # src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/ordererOrganizations/example.com/tlsca
 #    tlsCACerts:
@@ -219,9 +221,10 @@ orderers:
 peers:
   peer0.org1.example.com:
     # this URL is used to send endorsement and query requests
-    url: grpc://localhost:7051
+    url: grpc://139.9.120.244:7051
 
-
+    # this URL is used to connect the EventHub and registering event listeners
+    eventUrl: grpc://139.9.120.244:7053
 
     grpcOptions:
       grpc.http2.keepalive_time: 15
@@ -252,7 +255,8 @@ peers:
 
 
   peer1.org1.example.com:
-    url: grpc://localhost:7056
+    url: grpc://139.9.120.244:7056
+    eventUrl: grpc://139.9.120.244:7058
 
     grpcOptions:
       grpc.http2.keepalive_time: 15
@@ -267,8 +271,8 @@ peers:
 
 
   peer0.org2.example.com:
-    url: grpc://localhost:8051
-
+    url: grpc://139.9.127.140:8051
+    eventUrl: grpc://139.9.127.140:8053
 #    grpcOptions:
 #      ssl-target-name-override: peer0.org2.example.com
 #      negotiationType: TLS
@@ -300,7 +304,7 @@ certificateAuthorities:
     # [Optional] The optional name of the CA.
     caName: ca0
   ca-org2:
-    url: http://localhost:8054
+    url: http://139.9.127.140:8054
       # the properties specified under this object are passed to the 'http' client verbatim when
       # making the request to the Fabric-CA server
     httpOptions:
