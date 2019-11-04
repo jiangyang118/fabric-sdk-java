@@ -13,9 +13,9 @@ services:
       - GODEBUG=netdns=go
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
-      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/b59bba37975dafcc4a93984aa01d3d29b64894617db9e0c9a2d486b5273cbd27_sk
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/b59bba37975dafcc4a93984aa01d3d29b64894617db9e0c9a2d486b5273cbd27_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY
       - FABRIC_CA_SERVER_REGISTRY_MAXENROLLMENTS=-1
     ports:
       - "8054:7054"

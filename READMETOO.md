@@ -1,5 +1,6 @@
 
 ## 步骤
+以下步骤实现自定义域名，创建证书、创建创世区块，启动两台虚机运行fabric1.4.0网络，并执行End2endIT和NetworkConfigIT集成测试。
 
 将139.9.120.244定义为master华为云虚机；139.9.127.140定义为slave华为云虚机。
 
@@ -8,8 +9,14 @@
 cd /data/code/java/fabric-1.4.0
 git clone https://github.com/jiangyang118/fabric-sdk-java.git
 cd fabric-sdk-java
-git checkout multi-solo
+git checkout manu-coinfig
 cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration
+
+# 1.  创建证书
+# 2.  创建创世区块
+# 3.  修改运行的yaml文件中的配置
+# 4.  发送到salve服务器
+# 5.  启动网络，运行1个orderer；2个peer，1个ca；1个fabric-tools
 docker-compose -f 244.yaml up -d
 
 #日志如下
@@ -27,8 +34,13 @@ e1dd21938f1c        hyperledger/fabric-peer:1.4                                 
 cd /data/code/java/fabric-1.4.0
 git clone https://github.com/jiangyang118/fabric-sdk-java.git
 cd fabric-sdk-java
-git checkout multi-solo
+git checkout manu-coinfig
 cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration
+
+# 1.  修改运行的yaml文件中的配置
+
+
+# 2.  启动网络，运行1个orderer；2个peer，1个ca；1个fabric-tools
 docker-compose -f 140.yaml up -d
 
 #日志如下
@@ -41,6 +53,11 @@ cc1783271568        hyperledger/fabric-ca:1.4                                   
 
 ### 3. 在本地运行end2endIT单元测试
 ```shell
+
+#手动替换如下路径的sk文件
+#path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.esunego.com/users/Admin@org1.esunego.com/msp/keystore/8a48ddb8cb4cf9b376730f9f6bdb9d50dcc103b1cc9049c54f83db907849791a_sk
+     
+     
 clean test -Dtest=End2endIT
 
 #日志如下
@@ -51,182 +68,171 @@ clean test -Dtest=End2endIT
 Running org.hyperledger.fabric.sdkintegration.End2endIT
 
 
-
-RUNNING: End2endIT.
-
-***** Enrolling Users *****
-2019-10-31 08:32:12,750 main INFO  HFCAClient:594 - CA Name: ca0, Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNRekNDQWVxZ0F3SUJBZ0lSQU0vdmFEdlBzeUlpQzlodm41bm5SOEF3Q2dZSUtvWkl6ajBFQXdJd2N6RUwKTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnVENrTmhiR2xtYjNKdWFXRXhGakFVQmdOVkJBY1REVk5oYmlCRwpjbUZ1WTJselkyOHhHVEFYQmdOVkJBb1RFRzl5WnpFdVpYaGhiWEJzWlM1amIyMHhIREFhQmdOVkJBTVRFMk5oCkxtOXlaekV1WlhoaGJYQnNaUzVqYjIwd0hoY05NVGd3TWpJMU1USTBNekk1V2hjTk1qZ3dNakl6TVRJME16STUKV2pCek1Rc3dDUVlEVlFRR0V3SlZVekVUTUJFR0ExVUVDQk1LUTJGc2FXWnZjbTVwWVRFV01CUUdBMVVFQnhNTgpVMkZ1SUVaeVlXNWphWE5qYnpFWk1CY0dBMVVFQ2hNUWIzSm5NUzVsZUdGdGNHeGxMbU52YlRFY01Cb0dBMVVFCkF4TVRZMkV1YjNKbk1TNWxlR0Z0Y0d4bExtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUEKQkxxSTlkWDdkOU5HbzNndUw1RlA4b3RHc2lCak43QnpkNmRHL0NheUpEZmpOUkczNFlPOHQyOTl1NkVvRlh2egpwY2pBTUd1MFVLVHJ6TWZjeU91emNNeWpYekJkTUE0R0ExVWREd0VCL3dRRUF3SUJwakFQQmdOVkhTVUVDREFHCkJnUlZIU1VBTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3S1FZRFZSME9CQ0lFSUxITU5NUHkwTStBZUdqNk9ob1IKaDAwZ1FUQ0VYOWp1czIwdVdVVFhkbmNjTUFvR0NDcUdTTTQ5QkFNQ0EwY0FNRVFDSUY3V2wzQTExekVOcjFDbwpxR3l1M2g0ZkN1a2t0RlZ5Ry9XUEpVeWxWWGpJQWlCOUxqcFhtOUVSZ0pNZlpzakRJekNqOU00YVF1Vk45WExrClhueDB1b0t6N2c9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIDwI9XgGar29lWsgJQ5P++7nzIIlwWWGLEJ51ykde2A1EiCqCseWTnj4fux5l9ozepRqBhlZDfRZQFOKy755TIRikhpECiBvNt5Wcruon1yTI2OEtyActT1S0GLFcfCWXRMFykliiBIgL2P8/HJvbEI5pLb0LgoTUA1JDYYS+/MKC5irpY6t25wiRAogCAVRXVLX9SAwPD64Io0XEBFzpU0AOLnlUO84CJEN/XMSINGlHg7UFotyrB8gssFv3O56azHl+2X+k0nC2fS4IJY7IkQKILXIuSKsaLPOEnzyALvLpiW5rwRrAZZGHtkGx4CDUyY3EiDTMRCTEROrAXB/ZINA+RP3FzeUgnDLxLOes+OubkOQIyJECiA0wS8aoljJ6XkaAm6viC3+OY1WhN+zlEgfckCrIeFzixIgOKoxJtgZrFma+LPjLye6/RYlejeNegmSePueBMhOctYiRAogP3UpF6MJUiwgP1WAEdcEUmA1qBzM/pnh/P4DvTClVNsSII0ME/JUvx2G/KanqXhHSdiOPO8JMvl/oT9j86NE5acMKogBCiAkGHyPPIpfZ62j37rU+vuyhyVn3GTzHxzfENb4L81d9hIg4lovQafbr+EQ8oOgJNQYJTNoxrwt03gX0KoS351tA9AaIAprAFVW8Rj/oz5qv8EgezttuHVW6CeYxhClVaUXgkv8IiCB5IQt3kHBcfaLZ0G6T07NcgX0yEcLq/SCjjIzC+OMITJECiBjX+SptFK5yiKrp6p2unJEQzicZrOl7pcjQaYCRscHxBIgNa9BFzQiJmywsmJlMcjSexW66XrrJZzTGZIGjeuiobU6RAogiyMMfc2QIHR94xmd+qIfFFeu8C0G3x/as3asLSH63YcSIEPbCHzdb/sMxS5h42sPx+bhLbJ0UzYMapdOKilxyluFQiC+JXB0Nrg+JUDkXOO30VuNa1OWTaY+uui66lvI59+s/EogS5zQNR8QLbjptQUWittI672tran5xUvtidx7QeTSjQVSIHRZz7ANrFN/racCNVLnIrCqzxKU+QGje3+AuKvFasmy, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVVeWpzYmtvL2kxSUg0ZEEvOURBeE15RW9YUFczVTRJRQpaMUh2K0VmWXhka1IrWWRLdzVYb09BeGRvVnl0blUzZzJNTStTZ01XK1QyZnZNVHQxOHR3QkVITVRQZnE1VHBoCmZ1VExVaitvSVJFbEFXSkNsOW44cTVRcWFLWjZaekNlCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
-2019-10-31 08:32:12,760 main INFO  SampleStore:91 - Could not find the file "C:\Users\jiang\AppData\Local\Temp\HFCSampletest.properties"
-2019-10-31 08:32:12,765 main INFO  SampleStore:91 - Could not find the file "C:\Users\jiang\AppData\Local\Temp\HFCSampletest.properties"
-2019-10-31 08:32:13,763 main INFO  HFCAClient:594 - CA Name: ca0, Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNRekNDQWVxZ0F3SUJBZ0lSQU0vdmFEdlBzeUlpQzlodm41bm5SOEF3Q2dZSUtvWkl6ajBFQXdJd2N6RUwKTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnVENrTmhiR2xtYjNKdWFXRXhGakFVQmdOVkJBY1REVk5oYmlCRwpjbUZ1WTJselkyOHhHVEFYQmdOVkJBb1RFRzl5WnpFdVpYaGhiWEJzWlM1amIyMHhIREFhQmdOVkJBTVRFMk5oCkxtOXlaekV1WlhoaGJYQnNaUzVqYjIwd0hoY05NVGd3TWpJMU1USTBNekk1V2hjTk1qZ3dNakl6TVRJME16STUKV2pCek1Rc3dDUVlEVlFRR0V3SlZVekVUTUJFR0ExVUVDQk1LUTJGc2FXWnZjbTVwWVRFV01CUUdBMVVFQnhNTgpVMkZ1SUVaeVlXNWphWE5qYnpFWk1CY0dBMVVFQ2hNUWIzSm5NUzVsZUdGdGNHeGxMbU52YlRFY01Cb0dBMVVFCkF4TVRZMkV1YjNKbk1TNWxlR0Z0Y0d4bExtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUEKQkxxSTlkWDdkOU5HbzNndUw1RlA4b3RHc2lCak43QnpkNmRHL0NheUpEZmpOUkczNFlPOHQyOTl1NkVvRlh2egpwY2pBTUd1MFVLVHJ6TWZjeU91emNNeWpYekJkTUE0R0ExVWREd0VCL3dRRUF3SUJwakFQQmdOVkhTVUVDREFHCkJnUlZIU1VBTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3S1FZRFZSME9CQ0lFSUxITU5NUHkwTStBZUdqNk9ob1IKaDAwZ1FUQ0VYOWp1czIwdVdVVFhkbmNjTUFvR0NDcUdTTTQ5QkFNQ0EwY0FNRVFDSUY3V2wzQTExekVOcjFDbwpxR3l1M2g0ZkN1a2t0RlZ5Ry9XUEpVeWxWWGpJQWlCOUxqcFhtOUVSZ0pNZlpzakRJekNqOU00YVF1Vk45WExrClhueDB1b0t6N2c9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIDwI9XgGar29lWsgJQ5P++7nzIIlwWWGLEJ51ykde2A1EiCqCseWTnj4fux5l9ozepRqBhlZDfRZQFOKy755TIRikhpECiBvNt5Wcruon1yTI2OEtyActT1S0GLFcfCWXRMFykliiBIgL2P8/HJvbEI5pLb0LgoTUA1JDYYS+/MKC5irpY6t25wiRAogCAVRXVLX9SAwPD64Io0XEBFzpU0AOLnlUO84CJEN/XMSINGlHg7UFotyrB8gssFv3O56azHl+2X+k0nC2fS4IJY7IkQKILXIuSKsaLPOEnzyALvLpiW5rwRrAZZGHtkGx4CDUyY3EiDTMRCTEROrAXB/ZINA+RP3FzeUgnDLxLOes+OubkOQIyJECiA0wS8aoljJ6XkaAm6viC3+OY1WhN+zlEgfckCrIeFzixIgOKoxJtgZrFma+LPjLye6/RYlejeNegmSePueBMhOctYiRAogP3UpF6MJUiwgP1WAEdcEUmA1qBzM/pnh/P4DvTClVNsSII0ME/JUvx2G/KanqXhHSdiOPO8JMvl/oT9j86NE5acMKogBCiAkGHyPPIpfZ62j37rU+vuyhyVn3GTzHxzfENb4L81d9hIg4lovQafbr+EQ8oOgJNQYJTNoxrwt03gX0KoS351tA9AaIAprAFVW8Rj/oz5qv8EgezttuHVW6CeYxhClVaUXgkv8IiCB5IQt3kHBcfaLZ0G6T07NcgX0yEcLq/SCjjIzC+OMITJECiBjX+SptFK5yiKrp6p2unJEQzicZrOl7pcjQaYCRscHxBIgNa9BFzQiJmywsmJlMcjSexW66XrrJZzTGZIGjeuiobU6RAogiyMMfc2QIHR94xmd+qIfFFeu8C0G3x/as3asLSH63YcSIEPbCHzdb/sMxS5h42sPx+bhLbJ0UzYMapdOKilxyluFQiC+JXB0Nrg+JUDkXOO30VuNa1OWTaY+uui66lvI59+s/EogS5zQNR8QLbjptQUWittI672tran5xUvtidx7QeTSjQVSIHRZz7ANrFN/racCNVLnIrCqzxKU+QGje3+AuKvFasmy, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVVeWpzYmtvL2kxSUg0ZEEvOURBeE15RW9YUFczVTRJRQpaMUh2K0VmWXhka1IrWWRLdzVYb09BeGRvVnl0blUzZzJNTStTZ01XK1QyZnZNVHQxOHR3QkVITVRQZnE1VHBoCmZ1VExVaitvSVJFbEFXSkNsOW44cTVRcWFLWjZaekNlCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
-2019-10-31 08:32:13,764 main INFO  HFCAClient:1542 - CA Version: 1.4.3
-2019-10-31 08:32:14,474 main INFO  HFCAClient:594 - CA Name: , Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNRakNDQWVtZ0F3SUJBZ0lRQTUxUzVhVjhPRktUREVrQURhL0I0VEFLQmdncWhrak9QUVFEQWpCek1Rc3cKQ1FZRFZRUUdFd0pWVXpFVE1CRUdBMVVFQ0JNS1EyRnNhV1p2Y201cFlURVdNQlFHQTFVRUJ4TU5VMkZ1SUVaeQpZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTWk1bGVHRnRjR3hsTG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1CmIzSm5NaTVsZUdGdGNHeGxMbU52YlRBZUZ3MHhPREF5TWpVeE1qUXpNamxhRncweU9EQXlNak14TWpRek1qbGEKTUhNeEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUlFd3BEWVd4cFptOXlibWxoTVJZd0ZBWURWUVFIRXcxVApZVzRnUm5KaGJtTnBjMk52TVJrd0Z3WURWUVFLRXhCdmNtY3lMbVY0WVcxd2JHVXVZMjl0TVJ3d0dnWURWUVFECkV4TmpZUzV2Y21jeUxtVjRZVzF3YkdVdVkyOXRNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUUKWDcxcjVqUE5WWUwrQ3FPSDFXWlhZNmJ2ZXBReUxGUkVIdFVzT3VYRmZqbGVycEd3a1BWSk5pcERaVWlmVFJTOAppbWZqK3M2dHg1cFJKZHk4YldESVZhTmZNRjB3RGdZRFZSMFBBUUgvQkFRREFnR21NQThHQTFVZEpRUUlNQVlHCkJGVWRKUUF3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFwQmdOVkhRNEVJZ1FnZXl0MlU4UlJMV3pwVTE0NEZBWTEKOVRtOWloTUw1VXJKVDM0VEczV2c4ajR3Q2dZSUtvWkl6ajBFQXdJRFJ3QXdSQUlnY20vOEFGdms3OXBaekhCdQo3dEV6WXhwTTk5QWpIbkk3bFF1Z2F5b0QrMkFDSUQ2c2dmTk56RWdSbS81aVpBRGVMQVBpb1VpQkpVcUFJV1lxCkhLYWxkWnBiCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIKUN1bxKXUsUNOy+bfScpF2LI3sPbJ6LX0LLIlXSuLgAEiB/qs9QkyV/5tIw2YPvFbUCsXLQk1NXOQZ+RxPM6YVtoBpECiBPeZPNPzi1vI7bw5YBvJeTOdOBO0gt/ZlIsn3uV/uPIRIgSXkrGdp/DOfpPDT2nRQh+leoXzxmB7BbO6iTZF1I6LgiRAogyvToDr9W4PgKW1cEO/LoPk9Hl0R9CgUlBTBimT3qqVISICC3xNHi9Q0P/H9DebPXiqQzKhq8uK20ZFlgLLzg1dUVIkQKIKSwLtmjfeVVsYgtGxIO+TEOwqxgc0fSKW06t2ix90C3EiABoRYyojpG96USz5VSgqhwiGUwGF1yasXK4rUFPqdHtCJECiDpPEL4uY5ua8X15HClIuj5XqmlhM27PbDiPMlU67ySQBIg2UUaB2RdOKSfzDPGPmJFzp6W1ITZhU/yHrqj1JeV5/MiRAogj0GBMlvZd7laaacSt1QPl2OLPCEele8RuW/0ZjOM0rMSIBYSJHFQzcKCtfTZSnqy8jTsUxdUaNZPOEaJwTQWwIEUKogBCiDIB3FLD2NlcDCHKUj9YiuKTzfvmKiXBaQI7nK/FQzyghIgoSQL4DaPx45ZmTSM25ZMZ0lUhLud2xFGN461WmjS9/0aINp2Tn0FVlkgq1ziFEkTjqNf0TtdpmeBdKz9NSPuiOEgIiD91wH9nsr1Luq9EppzmfeigiUYnkHqF98EjHWJuUjCGTJECiBDum1pl02apBwaDJIsIkfQ/0EcDGCmnjf5/s92xsDezxIg8c0IcNQjkf8H+OaEQ++R6Bs3XizBKzgdk1YOCGG3SvU6RAogmcVXh2wtQs6ex4T6D1GPFQeb3vX5p7LxXcoc8LNsDlcSIEPtAmlOwOU0BmodnqUvJR2kgAjymC7ciQ8z9E9Z+Up/QiB/RZnDddQpHKAFKJoNBaYqz/Jos24GNAKb+hJfrlF8N0ogkdLAh3B2lSWCpzDJliL7wATU9OIvjnZ4VmzQPX8xha1SIIQ6XWpZn5NGEMPdfoKXn262cOdbyiKjTLa+4nXEc0wy, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUU2bGtLdlNhMWY1RnJLMHZXVENieEFMbnhlRXFYZ3dKawpBYzk4bHVwWG5GQmNhMjdHWEp5Z0lqMnNLM0Q5UHd6QTVYeHQzeTRVS215SFFTUGhJU2Y1Nnh2c08xRlV6cUQ4CjlPSHpCUGpQdXhsRnl5SG5Uems2bFJRQ2dBVU1HcmZMCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
-2019-10-31 08:32:14,885 main INFO  HFCAClient:594 - CA Name: , Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNRakNDQWVtZ0F3SUJBZ0lRQTUxUzVhVjhPRktUREVrQURhL0I0VEFLQmdncWhrak9QUVFEQWpCek1Rc3cKQ1FZRFZRUUdFd0pWVXpFVE1CRUdBMVVFQ0JNS1EyRnNhV1p2Y201cFlURVdNQlFHQTFVRUJ4TU5VMkZ1SUVaeQpZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTWk1bGVHRnRjR3hsTG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1CmIzSm5NaTVsZUdGdGNHeGxMbU52YlRBZUZ3MHhPREF5TWpVeE1qUXpNamxhRncweU9EQXlNak14TWpRek1qbGEKTUhNeEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUlFd3BEWVd4cFptOXlibWxoTVJZd0ZBWURWUVFIRXcxVApZVzRnUm5KaGJtTnBjMk52TVJrd0Z3WURWUVFLRXhCdmNtY3lMbVY0WVcxd2JHVXVZMjl0TVJ3d0dnWURWUVFECkV4TmpZUzV2Y21jeUxtVjRZVzF3YkdVdVkyOXRNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUUKWDcxcjVqUE5WWUwrQ3FPSDFXWlhZNmJ2ZXBReUxGUkVIdFVzT3VYRmZqbGVycEd3a1BWSk5pcERaVWlmVFJTOAppbWZqK3M2dHg1cFJKZHk4YldESVZhTmZNRjB3RGdZRFZSMFBBUUgvQkFRREFnR21NQThHQTFVZEpRUUlNQVlHCkJGVWRKUUF3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFwQmdOVkhRNEVJZ1FnZXl0MlU4UlJMV3pwVTE0NEZBWTEKOVRtOWloTUw1VXJKVDM0VEczV2c4ajR3Q2dZSUtvWkl6ajBFQXdJRFJ3QXdSQUlnY20vOEFGdms3OXBaekhCdQo3dEV6WXhwTTk5QWpIbkk3bFF1Z2F5b0QrMkFDSUQ2c2dmTk56RWdSbS81aVpBRGVMQVBpb1VpQkpVcUFJV1lxCkhLYWxkWnBiCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIKUN1bxKXUsUNOy+bfScpF2LI3sPbJ6LX0LLIlXSuLgAEiB/qs9QkyV/5tIw2YPvFbUCsXLQk1NXOQZ+RxPM6YVtoBpECiBPeZPNPzi1vI7bw5YBvJeTOdOBO0gt/ZlIsn3uV/uPIRIgSXkrGdp/DOfpPDT2nRQh+leoXzxmB7BbO6iTZF1I6LgiRAogyvToDr9W4PgKW1cEO/LoPk9Hl0R9CgUlBTBimT3qqVISICC3xNHi9Q0P/H9DebPXiqQzKhq8uK20ZFlgLLzg1dUVIkQKIKSwLtmjfeVVsYgtGxIO+TEOwqxgc0fSKW06t2ix90C3EiABoRYyojpG96USz5VSgqhwiGUwGF1yasXK4rUFPqdHtCJECiDpPEL4uY5ua8X15HClIuj5XqmlhM27PbDiPMlU67ySQBIg2UUaB2RdOKSfzDPGPmJFzp6W1ITZhU/yHrqj1JeV5/MiRAogj0GBMlvZd7laaacSt1QPl2OLPCEele8RuW/0ZjOM0rMSIBYSJHFQzcKCtfTZSnqy8jTsUxdUaNZPOEaJwTQWwIEUKogBCiDIB3FLD2NlcDCHKUj9YiuKTzfvmKiXBaQI7nK/FQzyghIgoSQL4DaPx45ZmTSM25ZMZ0lUhLud2xFGN461WmjS9/0aINp2Tn0FVlkgq1ziFEkTjqNf0TtdpmeBdKz9NSPuiOEgIiD91wH9nsr1Luq9EppzmfeigiUYnkHqF98EjHWJuUjCGTJECiBDum1pl02apBwaDJIsIkfQ/0EcDGCmnjf5/s92xsDezxIg8c0IcNQjkf8H+OaEQ++R6Bs3XizBKzgdk1YOCGG3SvU6RAogmcVXh2wtQs6ex4T6D1GPFQeb3vX5p7LxXcoc8LNsDlcSIEPtAmlOwOU0BmodnqUvJR2kgAjymC7ciQ8z9E9Z+Up/QiB/RZnDddQpHKAFKJoNBaYqz/Jos24GNAKb+hJfrlF8N0ogkdLAh3B2lSWCpzDJliL7wATU9OIvjnZ4VmzQPX8xha1SIIQ6XWpZn5NGEMPdfoKXn262cOdbyiKjTLa+4nXEc0wy, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUU2bGtLdlNhMWY1RnJLMHZXVENieEFMbnhlRXFYZ3dKawpBYzk4bHVwWG5GQmNhMjdHWEp5Z0lqMnNLM0Q5UHd6QTVYeHQzeTRVS215SFFTUGhJU2Y1Nnh2c08xRlV6cUQ4CjlPSHpCUGpQdXhsRnl5SG5Uems2bFJRQ2dBVU1HcmZMCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
-2019-10-31 08:32:14,886 main INFO  HFCAClient:1542 - CA Version: 1.4.3
-Constructing channel foo
 Created channel foo
-2019-10-31 08:32:21,328 main INFO  Channel:851 - Channel{id: 3, name: foo} joining Peer{ id: 5, name: peer0.org1.example.com, channelName: null, url: grpc://139.9.120.244:7051}.
-2019-10-31 08:32:21,756 main INFO  Channel:883 - Peer Peer{ id: 5, name: peer0.org1.example.com, channelName: foo, url: grpc://139.9.120.244:7051} joined into channel Channel{id: 3, name: foo}
-Peer peer0.org1.example.com joined channel foo
-2019-10-31 08:32:21,757 main INFO  Channel:851 - Channel{id: 3, name: foo} joining Peer{ id: 8, name: peer1.org1.example.com, channelName: null, url: grpc://139.9.120.244:7056}.
-2019-10-31 08:32:22,339 main INFO  Channel:883 - Peer Peer{ id: 8, name: peer1.org1.example.com, channelName: foo, url: grpc://139.9.120.244:7056} joined into channel Channel{id: 3, name: foo}
-Peer peer1.org1.example.com joined channel foo
-2019-10-31 08:32:23,287 main INFO  Channel:1259 - Channel Channel{id: 3, name: foo} eventThread started shutdown: false  thread: null 
+2019-11-04 08:09:31,090 main INFO  Channel:851 - Channel{id: 3, name: foo} joining Peer{ id: 5, name: peer1.org1.esunego.com, channelName: null, url: grpc://139.9.120.244:7056}.
+2019-11-04 08:09:33,321 main INFO  Channel:883 - Peer Peer{ id: 5, name: peer1.org1.esunego.com, channelName: foo, url: grpc://139.9.120.244:7056} joined into channel Channel{id: 3, name: foo}
+Peer peer1.org1.esunego.com joined channel foo
+2019-11-04 08:09:33,327 main INFO  Channel:851 - Channel{id: 3, name: foo} joining Peer{ id: 8, name: peer0.org1.esunego.com, channelName: null, url: grpc://139.9.120.244:7051}.
+2019-11-04 08:09:34,011 main INFO  Channel:883 - Peer Peer{ id: 8, name: peer0.org1.esunego.com, channelName: foo, url: grpc://139.9.120.244:7051} joined into channel Channel{id: 3, name: foo}
+Peer peer0.org1.esunego.com joined channel foo
+2019-11-04 08:09:36,427 main INFO  Channel:1259 - Channel Channel{id: 3, name: foo} eventThread started shutdown: false  thread: null 
 Finished initialization channel foo
-2019-10-31 08:32:23,472 pool-1-thread-1 INFO  Channel:5988 - Channel foo eventThread shutting down. shutdown: true  thread: pool-1-thread-1 
-2019-10-31 08:32:24,514 main INFO  Channel:1259 - Channel Channel{id: 16, name: foo} eventThread started shutdown: false  thread: null 
+2019-11-04 08:09:36,750 pool-1-thread-1 INFO  Channel:5988 - Channel foo eventThread shutting down. shutdown: true  thread: pool-1-thread-1 
+2019-11-04 08:09:38,764 main INFO  Channel:1259 - Channel Channel{id: 16, name: foo} eventThread started shutdown: false  thread: null 
 Running channel foo
 Creating install proposal
 Sending install proposal
-2019-10-31 08:32:26,643 main INFO  InstallProposalBuilder:243 - Installing 'example_cc_go::github.com/example_cc::1' language Go chaincode from directory: 'D:\code\java\fabric-sdk-java\src\test\fixture\sdkintegration\gocc\sample1\src\github.com\example_cc' with source location: 'src\github.com\example_cc'. chaincodePath:'github.com/example_cc'
-Successful install proposal response Txid: 9739297ec641c3aba91459af03b86cadf384b7beced04d31133748544f31bec9 from peer peer0.org1.example.com
-Successful install proposal response Txid: 9739297ec641c3aba91459af03b86cadf384b7beced04d31133748544f31bec9 from peer peer1.org1.example.com
+2019-11-04 08:10:43,480 main INFO  InstallProposalBuilder:243 - Installing 'example_cc_go::github.com/example_cc::1' language Go chaincode from directory: 'D:\code\java\fabric-sdk-java\src\test\fixture\sdkintegration\gocc\sample1\src\github.com\example_cc' with source location: 'src\github.com\example_cc'. chaincodePath:'github.com/example_cc'
+Successful install proposal response Txid: 27dda32abaaab035464a7699804853ae2fd2e44c7f01ea4c00bc381b74d87680 from peer peer1.org1.esunego.com
+Successful install proposal response Txid: 27dda32abaaab035464a7699804853ae2fd2e44c7f01ea4c00bc381b74d87680 from peer peer0.org1.esunego.com
 Received 2 install proposal responses. Successful+verified: 2 . Failed: 0
 Sending instantiateProposalRequest to all peers with arguments: a and b set to 100 and 200 respectively
-Succesful instantiate proposal response Txid: c61076b29a93edfcad99c5972cbeaba09f1a64cdedf012e273f0b30e3086213f from peer peer0.org1.example.com
-Succesful instantiate proposal response Txid: c61076b29a93edfcad99c5972cbeaba09f1a64cdedf012e273f0b30e3086213f from peer peer1.org1.example.com
+Succesful instantiate proposal response Txid: 58124f6cceb0aa113496e0b26d99dfd35a003edc01bf990d1f855921d74b9569 from peer peer1.org1.esunego.com
+Succesful instantiate proposal response Txid: 58124f6cceb0aa113496e0b26d99dfd35a003edc01bf990d1f855921d74b9569 from peer peer0.org1.esunego.com
 Received 2 instantiate proposal responses. Successful+verified: 2 . Failed: 0
 Sending instantiateTransaction to orderer with a and b set to 100 and 200 respectively
-Finished instantiate transaction with transaction id c61076b29a93edfcad99c5972cbeaba09f1a64cdedf012e273f0b30e3086213f
+Finished instantiate transaction with transaction id 58124f6cceb0aa113496e0b26d99dfd35a003edc01bf990d1f855921d74b9569
 sending transactionProposal to all peers with arguments: move(a,b,100)
-Successful transaction proposal response Txid: cc6cd1cdd76d3188a1772a95115463d2f2cf835b091e403fb0f5d1d1a8e396c5 from peer peer0.org1.example.com
-Successful transaction proposal response Txid: cc6cd1cdd76d3188a1772a95115463d2f2cf835b091e403fb0f5d1d1a8e396c5 from peer peer1.org1.example.com
+Successful transaction proposal response Txid: 8d73e88abac11095eab3176a5b7a49c7a8d4063da8b8fbec2101f6ee0b2b33bb from peer peer1.org1.esunego.com
+Successful transaction proposal response Txid: 8d73e88abac11095eab3176a5b7a49c7a8d4063da8b8fbec2101f6ee0b2b33bb from peer peer0.org1.esunego.com
 Received 2 transaction proposal responses. Successful+verified: 2 . Failed: 0
 Successfully received transaction proposal responses.
 Sending chaincode transaction(move a,b,100) to orderer.
-Finished transaction with transaction id cc6cd1cdd76d3188a1772a95115463d2f2cf835b091e403fb0f5d1d1a8e396c5
+RECEIVED Chaincode event with handle: CHAINCODE_EVENTS_HANDLEb33d8b2e-2f54-40fc-b47b-eb2880877624CHAINCODE_EVENTS_HANDLE, chaincode Id: example_cc_go, chaincode event name: event, transaction id: 8d73e88abac11095eab3176a5b7a49c7a8d4063da8b8fbec2101f6ee0b2b33bb, event payload: "!", from event source: peer0.org1.esunego.com
+RECEIVED Chaincode event with handle: CHAINCODE_EVENTS_HANDLEb33d8b2e-2f54-40fc-b47b-eb2880877624CHAINCODE_EVENTS_HANDLE, chaincode Id: example_cc_go, chaincode event name: event, transaction id: 8d73e88abac11095eab3176a5b7a49c7a8d4063da8b8fbec2101f6ee0b2b33bb, event payload: "!", from event source: peer1.org1.esunego.com
+Finished transaction with transaction id 8d73e88abac11095eab3176a5b7a49c7a8d4063da8b8fbec2101f6ee0b2b33bb
 Now query chaincode for the value of b.
-RECEIVED Chaincode event with handle: CHAINCODE_EVENTS_HANDLE369bdd4e-435a-4e46-9488-71717c3494e6CHAINCODE_EVENTS_HANDLE, chaincode Id: example_cc_go, chaincode event name: event, transaction id: cc6cd1cdd76d3188a1772a95115463d2f2cf835b091e403fb0f5d1d1a8e396c5, event payload: "!", from event source: peer1.org1.example.com
-RECEIVED Chaincode event with handle: CHAINCODE_EVENTS_HANDLE369bdd4e-435a-4e46-9488-71717c3494e6CHAINCODE_EVENTS_HANDLE, chaincode Id: example_cc_go, chaincode event name: event, transaction id: cc6cd1cdd76d3188a1772a95115463d2f2cf835b091e403fb0f5d1d1a8e396c5, event payload: "!", from event source: peer0.org1.example.com
-Query payload of b from peer peer0.org1.example.com returned 300
-Query payload of b from peer peer1.org1.example.com returned 300
+Query payload of b from peer peer1.org1.esunego.com returned 300
+Query payload of b from peer peer0.org1.esunego.com returned 300
 Channel info for : foo
 Channel height: 3
-Chain current block hash: d3f280410355c8e67d380177971aafa1758429ab12e35288cdee9bce7118dc22
-Chainl previous block hash: c56375d9e734951604eeb129c21a0a72dfb2c8b9909bdf177b0f2050be756d77
+Chain current block hash: 34362236a65d5e88223894da5fa39b5b25b26184feed222930ffc9491de2487d
+Chainl previous block hash: 58d6779e73e34f933ed83dcd84867993a5d91a7fcca5d8839c82fe28c09a70dc
 queryBlockByNumber returned correct block with blockNumber 2 
- previous_hash c56375d9e734951604eeb129c21a0a72dfb2c8b9909bdf177b0f2050be756d77
+ previous_hash 58d6779e73e34f933ed83dcd84867993a5d91a7fcca5d8839c82fe28c09a70dc
 queryBlockByHash returned block with blockNumber 1
 queryBlockByTxID returned block with blockNumber 2
-QueryTransactionByID returned TransactionInfo: txID cc6cd1cdd76d3188a1772a95115463d2f2cf835b091e403fb0f5d1d1a8e396c5
+QueryTransactionByID returned TransactionInfo: txID 8d73e88abac11095eab3176a5b7a49c7a8d4063da8b8fbec2101f6ee0b2b33bb
      validation code 0
 Running for Channel foo done
+2019-11-04 08:14:03,510 pool-1-thread-1 INFO  Channel:5988 - Channel foo eventThread shutting down. shutdown: true  thread: pool-1-thread-1 
 
 
 Constructing channel bar
-2019-10-31 08:32:36,411 pool-1-thread-1 INFO  Channel:5988 - Channel foo eventThread shutting down. shutdown: true  thread: pool-1-thread-1 
+sdkintegration\e2e-2Orgs\v1.3\bar.tx
+src\test\fixture\sdkintegration\e2e-2Orgs\v1.3\bar.tx
 Created channel bar
-2019-10-31 08:32:36,908 main INFO  Channel:851 - Channel{id: 32, name: bar} joining Peer{ id: 34, name: peer0.org2.example.com, channelName: null, url: grpc://139.9.127.140:8051}.
-2019-10-31 08:32:37,276 main INFO  Channel:883 - Peer Peer{ id: 34, name: peer0.org2.example.com, channelName: bar, url: grpc://139.9.127.140:8051} joined into channel Channel{id: 32, name: bar}
-Peer peer0.org2.example.com joined channel bar
-2019-10-31 08:32:37,277 main INFO  Channel:851 - Channel{id: 32, name: bar} joining Peer{ id: 37, name: peer1.org2.example.com, channelName: null, url: grpc://139.9.127.140:8056}.
-2019-10-31 08:32:37,585 main INFO  Channel:883 - Peer Peer{ id: 37, name: peer1.org2.example.com, channelName: bar, url: grpc://139.9.127.140:8056} joined into channel Channel{id: 32, name: bar}
-Peer peer1.org2.example.com joined channel bar
-2019-10-31 08:32:38,335 main INFO  Channel:1259 - Channel Channel{id: 32, name: bar} eventThread started shutdown: false  thread: null 
+2019-11-04 08:14:42,583 main INFO  Channel:851 - Channel{id: 31, name: bar} joining Peer{ id: 33, name: peer0.org2.esunego.com, channelName: null, url: grpc://139.9.127.140:8051}.
+2019-11-04 08:14:44,499 main INFO  Channel:883 - Peer Peer{ id: 33, name: peer0.org2.esunego.com, channelName: bar, url: grpc://139.9.127.140:8051} joined into channel Channel{id: 31, name: bar}
+Peer peer0.org2.esunego.com joined channel bar
+2019-11-04 08:14:44,519 main INFO  Channel:851 - Channel{id: 31, name: bar} joining Peer{ id: 36, name: peer1.org2.esunego.com, channelName: null, url: grpc://139.9.127.140:8056}.
+2019-11-04 08:14:46,359 main INFO  Channel:883 - Peer Peer{ id: 36, name: peer1.org2.esunego.com, channelName: bar, url: grpc://139.9.127.140:8056} joined into channel Channel{id: 31, name: bar}
+Peer peer1.org2.esunego.com joined channel bar
+2019-11-04 08:14:47,765 main INFO  Channel:1259 - Channel Channel{id: 31, name: bar} eventThread started shutdown: false  thread: null 
 Finished initialization channel bar
-2019-10-31 08:32:38,515 pool-1-thread-1 INFO  Channel:5988 - Channel bar eventThread shutting down. shutdown: true  thread: pool-1-thread-1 
-2019-10-31 08:32:39,325 main INFO  Channel:1259 - Channel Channel{id: 45, name: bar} eventThread started shutdown: false  thread: null 
+2019-11-04 08:14:47,980 pool-1-thread-1 INFO  Channel:5988 - Channel bar eventThread shutting down. shutdown: true  thread: pool-1-thread-1 
+2019-11-04 08:14:49,814 main INFO  Channel:1259 - Channel Channel{id: 44, name: bar} eventThread started shutdown: false  thread: null 
 Running channel bar
 Creating install proposal
 Sending install proposal
-2019-10-31 08:32:42,368 main INFO  InstallProposalBuilder:257 - Installing 'example_cc_go::github.com/example_cc::1'  Go chaincode chaincodePath:'github.com/example_cc' from input stream
-Successful install proposal response Txid: 24879121a6a7945dc12708d57f6fbb294e03fc3ce28d5a0dcaabeaf7012aee45 from peer peer1.org2.example.com
-Successful install proposal response Txid: 24879121a6a7945dc12708d57f6fbb294e03fc3ce28d5a0dcaabeaf7012aee45 from peer peer0.org2.example.com
+2019-11-04 08:15:51,857 main INFO  InstallProposalBuilder:257 - Installing 'example_cc_go::github.com/example_cc::1'  Go chaincode chaincodePath:'github.com/example_cc' from input stream
+Successful install proposal response Txid: eecaeaef963636ece00de0f747b82409d02cac896840f309b8b37356463d4a5b from peer peer0.org2.esunego.com
+Successful install proposal response Txid: eecaeaef963636ece00de0f747b82409d02cac896840f309b8b37356463d4a5b from peer peer1.org2.esunego.com
 Received 2 install proposal responses. Successful+verified: 2 . Failed: 0
 Sending instantiateProposalRequest to all peers with arguments: a and b set to 100 and 300 respectively
-Succesful instantiate proposal response Txid: e0d1f86d0bda575e12bed47f0a0ed45047ead6b495a6755f6cfdf3e242484b0c from peer peer1.org2.example.com
-Succesful instantiate proposal response Txid: e0d1f86d0bda575e12bed47f0a0ed45047ead6b495a6755f6cfdf3e242484b0c from peer peer0.org2.example.com
+Succesful instantiate proposal response Txid: fc776c805471049469cf6319b982c6370685edbcda0d7ee72b1f0b9538484b47 from peer peer0.org2.esunego.com
+Succesful instantiate proposal response Txid: fc776c805471049469cf6319b982c6370685edbcda0d7ee72b1f0b9538484b47 from peer peer1.org2.esunego.com
 Received 2 instantiate proposal responses. Successful+verified: 2 . Failed: 0
 Sending instantiateTransaction to orderer with a and b set to 100 and 300 respectively
-Finished instantiate transaction with transaction id e0d1f86d0bda575e12bed47f0a0ed45047ead6b495a6755f6cfdf3e242484b0c
+Finished instantiate transaction with transaction id fc776c805471049469cf6319b982c6370685edbcda0d7ee72b1f0b9538484b47
 sending transactionProposal to all peers with arguments: move(a,b,100)
-Successful transaction proposal response Txid: b2ee5139866bdba5628b38fae8bfd2289bcff3810a57b38db3a5d283ae19f13a from peer peer1.org2.example.com
-Successful transaction proposal response Txid: b2ee5139866bdba5628b38fae8bfd2289bcff3810a57b38db3a5d283ae19f13a from peer peer0.org2.example.com
+Successful transaction proposal response Txid: 7958375d6b532a77193946e9b7d0309d43c2842ee54dbd04bad559248794cef0 from peer peer0.org2.esunego.com
+Successful transaction proposal response Txid: 7958375d6b532a77193946e9b7d0309d43c2842ee54dbd04bad559248794cef0 from peer peer1.org2.esunego.com
 Received 2 transaction proposal responses. Successful+verified: 2 . Failed: 0
 Successfully received transaction proposal responses.
 Sending chaincode transaction(move a,b,100) to orderer.
-Finished transaction with transaction id b2ee5139866bdba5628b38fae8bfd2289bcff3810a57b38db3a5d283ae19f13a
+Finished transaction with transaction id 7958375d6b532a77193946e9b7d0309d43c2842ee54dbd04bad559248794cef0
 Now query chaincode for the value of b.
-Query payload of b from peer peer1.org2.example.com returned 400
-Query payload of b from peer peer0.org2.example.com returned 400
+Query payload of b from peer peer0.org2.esunego.com returned 400
+Query payload of b from peer peer1.org2.esunego.com returned 400
 Channel info for : bar
 Channel height: 3
-Chain current block hash: cf62df8852aa3d5cba4802a367829f497e9ea93e897347c7c684588296597ff0
-Chainl previous block hash: b656f0abd315a31ec433d84c690563e5f1d43ace6c9a4704f431bc93d2217d13
+Chain current block hash: cab837140997b069feaba320d452989b9ce0d840290fac062e3d2a2baa5227c0
+Chainl previous block hash: 217bb1b2c2dfaf6eeb84ddbe534f019298097d65bd78ee975ca1376ce3f9362f
 queryBlockByNumber returned correct block with blockNumber 2 
- previous_hash b656f0abd315a31ec433d84c690563e5f1d43ace6c9a4704f431bc93d2217d13
+ previous_hash 217bb1b2c2dfaf6eeb84ddbe534f019298097d65bd78ee975ca1376ce3f9362f
 queryBlockByHash returned block with blockNumber 1
 queryBlockByTxID returned block with blockNumber 2
-QueryTransactionByID returned TransactionInfo: txID b2ee5139866bdba5628b38fae8bfd2289bcff3810a57b38db3a5d283ae19f13a
+QueryTransactionByID returned TransactionInfo: txID 7958375d6b532a77193946e9b7d0309d43c2842ee54dbd04bad559248794cef0
      validation code 0
 Running for Channel bar done
 
 Traverse the blocks for chain bar 
-current block number 2 has data hash: d7f8a77322f8c2eeba22c677dc93e4e5463e08a561544e3d419a80bdededf96e
-current block number 2 has previous hash id: b656f0abd315a31ec433d84c690563e5f1d43ace6c9a4704f431bc93d2217d13
-current block number 2 has calculated block hash is cf62df8852aa3d5cba4802a367829f497e9ea93e897347c7c684588296597ff0
+current block number 2 has data hash: 7ed8f76c7aa8bbc3243ef7d70b97b7391552611aec86cc0744769d3d0d4e24aa
+current block number 2 has previous hash id: 217bb1b2c2dfaf6eeb84ddbe534f019298097d65bd78ee975ca1376ce3f9362f
+current block number 2 has calculated block hash is cab837140997b069feaba320d452989b9ce0d840290fac062e3d2a2baa5227c0
 current block number 2 has 1 envelope count:
-  Transaction number 1 has transaction id: b2ee5139866bdba5628b38fae8bfd2289bcff3810a57b38db3a5d283ae19f13a
+  Transaction number 1 has transaction id: 7958375d6b532a77193946e9b7d0309d43c2842ee54dbd04bad559248794cef0
   Transaction number 1 has channel id: bar
   Transaction number 1 has epoch: 0
-  Transaction number 1 has transaction timestamp: 十月 31,  2019  16:32:48 下午
+  Transaction number 1 has transaction timestamp: 十一月 4,  2019  16:18:37 下午
   Transaction number 1 has type id: TRANSACTION_ENVELOPE
-  Transaction number 1 has nonce : cc01e61ad5e9eee37d92b0e61455bee607d68ea2cd99851a
+  Transaction number 1 has nonce : 0e992cfb0a72a6816e94db5081e6e02cac76e2a49cd7d0a8
   Transaction number 1 has submitter mspid: Org2MSP,  certificate: -----BEGIN CERTIFICATE-----
-MIICjjCCAjWgAwIBAgIUGbdnI9z7ZEn9k2F+M51nNs/WNf0wCgYIKoZIzj0EAwIw
+MIICjjCCAjWgAwIBAgIUPH3GOHONtQd1yPzkaCCwDZZrBxAwCgYIKoZIzj0EAwIw
 czELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh
-biBGcmFuY2lzY28xGTAXBgNVBAoTEG9yZzIuZXhhbXBsZS5jb20xHDAaBgNVBAMT
-E2NhLm9yZzIuZXhhbXBsZS5jb20wHhcNMTkxMDMxMDgyNzAwWhcNMjAxMDMwMDgz
-MjAwWjBCMTAwDQYDVQQLEwZjbGllbnQwCwYDVQQLEwRvcmcxMBIGA1UECxMLZGVw
+biBGcmFuY2lzY28xGTAXBgNVBAoTEG9yZzIuZXN1bmVnby5jb20xHDAaBgNVBAMT
+E2NhLm9yZzIuZXN1bmVnby5jb20wHhcNMTkxMTA0MDgwNDAwWhcNMjAxMTAzMDgw
+OTAwWjBCMTAwDQYDVQQLEwZjbGllbnQwCwYDVQQLEwRvcmcxMBIGA1UECxMLZGVw
 YXJ0bWVudDExDjAMBgNVBAMTBXVzZXIxMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD
-QgAErrfwntR1lCvVcq3PmD1sPiT4cnPZQzAJCafmbCyDnCDBrU/03PAcHf+RnFzW
-npwvJlsh+Lcn2RrD5qWLs4/OKqOB1zCB1DAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0T
-AQH/BAIwADAdBgNVHQ4EFgQUT88lh1juaPRr3yv6/Ck28Q/MaRswKwYDVR0jBCQw
-IoAgeyt2U8RRLWzpU144FAY19Tm9ihML5UrJT34TG3Wg8j4waAYIKgMEBQYHCAEE
+QgAEJajam6EY/DF7oSAdUNAfZpzsP/WQLhoV8aK2wLg9uLcQOycKucT0Trt3DrRv
++4baX2tcRTMCtnnKNR9V2M5BmKOB1zCB1DAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0T
+AQH/BAIwADAdBgNVHQ4EFgQUbDgO848bsUxPZdS7LqsGPt8cFC8wKwYDVR0jBCQw
+IoAgZHl6a+nTBbitUOTSCJ7ltHWgu/cNEVWHT0R/lfeFF/wwaAYIKgMEBQYHCAEE
 XHsiYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiJvcmcxLmRlcGFydG1lbnQxIiwi
 aGYuRW5yb2xsbWVudElEIjoidXNlcjEiLCJoZi5UeXBlIjoiY2xpZW50In19MAoG
-CCqGSM49BAMCA0cAMEQCIFN6DQmNGbXsD0lFtIEGUVZP/I+dCQvoEbmv0eu3MYMN
-AiAkirZhuj2u7QRsC5r+pz1ZEdwKQ56heSxBJ5uAX3R/gw==
+CCqGSM49BAMCA0cAMEQCIAfv6aqkaPi3oJi6UJb+yn/dm3FlXO8yuk81D3mulA4x
+AiBBjTBSvAMTT1VcoMYsmhVi4uYe/Pq1FHdKXqaqT9C8ZA==
 -----END CERTIFICATE-----
 
   Transaction number 1 has 1 actions
   Transaction number 1 isValid true
   Transaction number 1 validation code 0
-   Transaction action 1 has response status 210
+   Transaction action 1 has response status 179
    Transaction action 1 has response message bytes as string: 
    Transaction action 1 has 2 endorsements
-Endorser 0 signature: 30440220469e8ac76953f58ac89b7fe4cce79f21acbe2a647c572a94f056d7724836800b022072d52d5bfb07c6bb43da1aa2114c5425aa4fd3979f2c4726b6ed56d9c1695cce
+Endorser 0 signature: 3044022035d1d7741f50a2f03d287b0bb80c9c0553498cda8504969726f612f49c52537e02203f2ca74bf236f20d3e52663ccc8d5df4a7113acf36d9f573a75d3996813b9aa7
 Endorser 0 endorser: mspid Org2MSP 
  certificate -----BEGIN CERTIFICATE-----
-MIICGDCCAb+gAwIBAgIQKHCjvLJSTkKm5lsAG4StsTAKBggqhkjOPQQDAjBzMQsw
+MIICKDCCAc6gAwIBAgIQVItsizp+FnWSTxWp3vpRizAKBggqhkjOPQQDAjBzMQsw
 CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNU2FuIEZy
-YW5jaXNjbzEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eu
-b3JnMi5leGFtcGxlLmNvbTAeFw0xODAyMjUxMjQzMjlaFw0yODAyMjMxMjQzMjla
-MFsxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1T
-YW4gRnJhbmNpc2NvMR8wHQYDVQQDExZwZWVyMS5vcmcyLmV4YW1wbGUuY29tMFkw
-EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIPHSGaXYokkyDT7hjv7xR7qdr/4unay4
-6ney+f+SaX3/+GS23ETzxjeZYyoKYy+nMjTGVtMx1k9m/KHHZUS4PaNNMEswDgYD
-VR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwKwYDVR0jBCQwIoAgeyt2U8RRLWzp
-U144FAY19Tm9ihML5UrJT34TG3Wg8j4wCgYIKoZIzj0EAwIDRwAwRAIgRiUmbSDL
-ZT4ETQzsS57MpfinlBo+WM/3ChUtTOL8BlgCIB8jfwjtaP22vH4w+V52ztTgQCnq
-lCO/1jpx9z0ii78C
+YW5jaXNjbzEZMBcGA1UEChMQb3JnMi5lc3VuZWdvLmNvbTEcMBoGA1UEAxMTY2Eu
+b3JnMi5lc3VuZWdvLmNvbTAeFw0xOTExMDIxNDIxMDBaFw0yOTEwMzAxNDIxMDBa
+MGoxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1T
+YW4gRnJhbmNpc2NvMQ0wCwYDVQQLEwRwZWVyMR8wHQYDVQQDExZwZWVyMC5vcmcy
+LmVzdW5lZ28uY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+ffClmR4zXgJ
+HXpDqKqyXTM+A4b6mr/gQa+p8HT3NnETZiw8cnYM16v/cG73ExECBPWu+tTQuo0d
+8WtVg/fZkKNNMEswDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwKwYDVR0j
+BCQwIoAgZHl6a+nTBbitUOTSCJ7ltHWgu/cNEVWHT0R/lfeFF/wwCgYIKoZIzj0E
+AwIDSAAwRQIhAOuyYzbJmkTmjc2AgHM8TqIbMNz1I2jQU62UdfxjUP0qAiAWXQa+
+I/xNIXO7PKShgc7z5whCdbeiR6DNWLdsS9UDbw==
 -----END CERTIFICATE-----
 
-Endorser 1 signature: 3045022100f46315271e3646edaf774824338ab01acec8fd5fa774b8b8238b46d37bc5d854022000e9c3bd0f3de5a041556c0b2470248b8d1a993632f018f4c9e5ee27fda65363
+Endorser 1 signature: 3044022033361ddb3ae53d7016f7ceb9e8081230d6cb8227a3ff596210e92c10981bb5a902207de9ddafb112e5300c899fed29fc8627a279e34cdc38ed523d9d601d5e7fbab2
 Endorser 1 endorser: mspid Org2MSP 
  certificate -----BEGIN CERTIFICATE-----
-MIICGTCCAcCgAwIBAgIRAKoFq36AGyh9tmw1qzjKp2YwCgYIKoZIzj0EAwIwczEL
+MIICKDCCAc+gAwIBAgIRAKd7Ortw6lNi6RAfMm3fwAkwCgYIKoZIzj0EAwIwczEL
 MAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBG
-cmFuY2lzY28xGTAXBgNVBAoTEG9yZzIuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh
-Lm9yZzIuZXhhbXBsZS5jb20wHhcNMTgwMjI1MTI0MzI5WhcNMjgwMjIzMTI0MzI5
-WjBbMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMN
-U2FuIEZyYW5jaXNjbzEfMB0GA1UEAxMWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBZ
-MBMGByqGSM49AgEGCCqGSM49AwEHA0IABFBM3gDUs/4Mp9DyF/uiUQkQk1UvqmmC
-uhuAXJgeTAob/tzvsLGGRS78dsuPVSGVS3p4vtuPhUBMVKtrnscgjemjTTBLMA4G
-A1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMCsGA1UdIwQkMCKAIHsrdlPEUS1s
-6VNeOBQGNfU5vYoTC+VKyU9+Ext1oPI+MAoGCCqGSM49BAMCA0cAMEQCIDbFc/hr
-0RYfp0e9HqBW+tel9c9VCW7E+C7XO4e7ZYBJAiAVkjEFKpKadLUpA2cK0YHobNRH
-zxIaKjL+wLVfr2wTzQ==
+cmFuY2lzY28xGTAXBgNVBAoTEG9yZzIuZXN1bmVnby5jb20xHDAaBgNVBAMTE2Nh
+Lm9yZzIuZXN1bmVnby5jb20wHhcNMTkxMTAyMTQyMTAwWhcNMjkxMDMwMTQyMTAw
+WjBqMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMN
+U2FuIEZyYW5jaXNjbzENMAsGA1UECxMEcGVlcjEfMB0GA1UEAxMWcGVlcjEub3Jn
+Mi5lc3VuZWdvLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDjBZ5iCDThC
+im9Xur5YYCRLFEFdPgeRRnekqzM8V+i10W5dtBZTEhdbgDDeY3qEHZQ3vQHxufqC
+yJSXbLwvgm+jTTBLMA4GA1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMCsGA1Ud
+IwQkMCKAIGR5emvp0wW4rVDk0gie5bR1oLv3DRFVh09Ef5X3hRf8MAoGCCqGSM49
+BAMCA0cAMEQCIBWz34zoqJNMaLk3FctxUig5Qk7PuYdVmnimu0tw0PMGAiB59riI
+/Uxle8lQbuFEOrMVZc3ki639PKjZGx+iXoRj4g==
 -----END CERTIFICATE-----
 
    Transaction action 1 has 4 chaincode input arguments
@@ -234,7 +240,7 @@ zxIaKjL+wLVfr2wTzQ==
      Transaction action 1 has chaincode input argument 1 is: a
      Transaction action 1 has chaincode input argument 2 is: b
      Transaction action 1 has chaincode input argument 3 is: 100
-   Transaction action 1 proposal response status: 210
+   Transaction action 1 proposal response status: 179
    Transaction action 1 proposal response payload: :)
    Transaction action 1 proposal chaincodeIDName: example_cc_go, chaincodeIDVersion: 1
    Transaction action 1 has 2 name space read write sets
@@ -243,29 +249,29 @@ zxIaKjL+wLVfr2wTzQ==
      Namespace example_cc_go write set 0 key a has value '400' 
      Namespace example_cc_go write set 1 key b has value '400' 
      Namespace lscc read set 0 key example_cc_go  version [1:0]
-current block number 1 has data hash: c5674608142b1894fc6f5a28443caa4e31a75a9e51ea11742f7bfb801a3155d3
-current block number 1 has previous hash id: b7d5e295c822c978df1107d07923348abdda0c9e0dfbe2ca109e5ffcd820333c
-current block number 1 has calculated block hash is b656f0abd315a31ec433d84c690563e5f1d43ace6c9a4704f431bc93d2217d13
+current block number 1 has data hash: db516ce08a1e170dcd4ec803572b59459066d5778303a670a0bdb1af19118c2d
+current block number 1 has previous hash id: c7968e5a77a4c5fa8671baf2ee61c51dc92096dcd63a0eaa1ae894e6e1f1abb2
+current block number 1 has calculated block hash is 217bb1b2c2dfaf6eeb84ddbe534f019298097d65bd78ee975ca1376ce3f9362f
 current block number 1 has 1 envelope count:
-  Transaction number 1 has transaction id: e0d1f86d0bda575e12bed47f0a0ed45047ead6b495a6755f6cfdf3e242484b0c
+  Transaction number 1 has transaction id: fc776c805471049469cf6319b982c6370685edbcda0d7ee72b1f0b9538484b47
   Transaction number 1 has channel id: bar
   Transaction number 1 has epoch: 0
-  Transaction number 1 has transaction timestamp: 十月 31,  2019  16:32:45 下午
+  Transaction number 1 has transaction timestamp: 十一月 4,  2019  16:16:58 下午
   Transaction number 1 has type id: TRANSACTION_ENVELOPE
-  Transaction number 1 has nonce : 225778237579331763d6b3eb57b4604d08a20ed4d0bb371b
+  Transaction number 1 has nonce : f01ff5a1ac1e6aab03200f64a7d27abc24dca8c028c19796
   Transaction number 1 has submitter mspid: Org2MSP,  certificate: -----BEGIN CERTIFICATE-----
-MIICGjCCAcCgAwIBAgIRAIrZokP5xguxCqWjUeu0jnAwCgYIKoZIzj0EAwIwczEL
+MIICKjCCAdCgAwIBAgIRAIiZFJm+IQ2FhivPvc1bnFgwCgYIKoZIzj0EAwIwczEL
 MAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBG
-cmFuY2lzY28xGTAXBgNVBAoTEG9yZzIuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh
-Lm9yZzIuZXhhbXBsZS5jb20wHhcNMTgwMjI1MTI0MzI5WhcNMjgwMjIzMTI0MzI5
-WjBbMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMN
-U2FuIEZyYW5jaXNjbzEfMB0GA1UEAwwWQWRtaW5Ab3JnMi5leGFtcGxlLmNvbTBZ
-MBMGByqGSM49AgEGCCqGSM49AwEHA0IABGDqXVD4yOX65oU0eY3j5UtD8Gr8n/s+
-eODjPP76wNeBoSqljQYM+D953dBtzZ87udrwQ2uvcpUI1R1mHTMuNmSjTTBLMA4G
-A1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMCsGA1UdIwQkMCKAIHsrdlPEUS1s
-6VNeOBQGNfU5vYoTC+VKyU9+Ext1oPI+MAoGCCqGSM49BAMCA0gAMEUCIQCojuxd
-EqSDDDUUJstAmAqU65xkd1/Yf0BVpLdCe++WigIgLWC9rBPpUa+Yhe3yy00+BlqG
-xZ0h2eeiHaMuF6Qawy4=
+cmFuY2lzY28xGTAXBgNVBAoTEG9yZzIuZXN1bmVnby5jb20xHDAaBgNVBAMTE2Nh
+Lm9yZzIuZXN1bmVnby5jb20wHhcNMTkxMTAyMTQyMTAwWhcNMjkxMDMwMTQyMTAw
+WjBrMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMN
+U2FuIEZyYW5jaXNjbzEOMAwGA1UECxMFYWRtaW4xHzAdBgNVBAMMFkFkbWluQG9y
+ZzIuZXN1bmVnby5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARAltd52kvv
+ZPVWBCZm8p5S+7Li/+kNTzArXA2Aeu3jUpxl9Czh5etcF1k96LbNjU1MJylNb1R9
+gt8me59wyv/ko00wSzAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADArBgNV
+HSMEJDAigCBkeXpr6dMFuK1Q5NIInuW0daC79w0RVYdPRH+V94UX/DAKBggqhkjO
+PQQDAgNIADBFAiEAvUXkGLwapp+QkAgyWmclbtsfpIfPPMHpPXezTNbhKysCIDGT
+e4t2A4ejNBw1zpgH+AYBDTeRsTynuurDdu+mpnVH
 -----END CERTIFICATE-----
 
   Transaction number 1 has 1 actions
@@ -274,38 +280,38 @@ xZ0h2eeiHaMuF6Qawy4=
    Transaction action 1 has response status 200
    Transaction action 1 has response message bytes as string: 
    Transaction action 1 has 2 endorsements
-Endorser 0 signature: 3045022100f96bb675772470015337c95585f1c3226f57e367bc1c87f7e50c3fec3af5261102200308c6b2da517ff197356ae7d78fddc307d90818bd7cfaa8b9ed97212a8afb8a
+Endorser 0 signature: 3045022100b2b5e947fbe6ae4328ad0bfe6ad508859773800d710cff7e48a01c0e67a81e0b022051dca8d425c51ae4aaa92baf5c168b99f3204eb7bc098bfaa1f319b3214d99df
 Endorser 0 endorser: mspid Org2MSP 
  certificate -----BEGIN CERTIFICATE-----
-MIICGDCCAb+gAwIBAgIQKHCjvLJSTkKm5lsAG4StsTAKBggqhkjOPQQDAjBzMQsw
+MIICKDCCAc6gAwIBAgIQVItsizp+FnWSTxWp3vpRizAKBggqhkjOPQQDAjBzMQsw
 CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNU2FuIEZy
-YW5jaXNjbzEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eu
-b3JnMi5leGFtcGxlLmNvbTAeFw0xODAyMjUxMjQzMjlaFw0yODAyMjMxMjQzMjla
-MFsxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1T
-YW4gRnJhbmNpc2NvMR8wHQYDVQQDExZwZWVyMS5vcmcyLmV4YW1wbGUuY29tMFkw
-EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIPHSGaXYokkyDT7hjv7xR7qdr/4unay4
-6ney+f+SaX3/+GS23ETzxjeZYyoKYy+nMjTGVtMx1k9m/KHHZUS4PaNNMEswDgYD
-VR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwKwYDVR0jBCQwIoAgeyt2U8RRLWzp
-U144FAY19Tm9ihML5UrJT34TG3Wg8j4wCgYIKoZIzj0EAwIDRwAwRAIgRiUmbSDL
-ZT4ETQzsS57MpfinlBo+WM/3ChUtTOL8BlgCIB8jfwjtaP22vH4w+V52ztTgQCnq
-lCO/1jpx9z0ii78C
+YW5jaXNjbzEZMBcGA1UEChMQb3JnMi5lc3VuZWdvLmNvbTEcMBoGA1UEAxMTY2Eu
+b3JnMi5lc3VuZWdvLmNvbTAeFw0xOTExMDIxNDIxMDBaFw0yOTEwMzAxNDIxMDBa
+MGoxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1T
+YW4gRnJhbmNpc2NvMQ0wCwYDVQQLEwRwZWVyMR8wHQYDVQQDExZwZWVyMC5vcmcy
+LmVzdW5lZ28uY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+ffClmR4zXgJ
+HXpDqKqyXTM+A4b6mr/gQa+p8HT3NnETZiw8cnYM16v/cG73ExECBPWu+tTQuo0d
+8WtVg/fZkKNNMEswDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwKwYDVR0j
+BCQwIoAgZHl6a+nTBbitUOTSCJ7ltHWgu/cNEVWHT0R/lfeFF/wwCgYIKoZIzj0E
+AwIDSAAwRQIhAOuyYzbJmkTmjc2AgHM8TqIbMNz1I2jQU62UdfxjUP0qAiAWXQa+
+I/xNIXO7PKShgc7z5whCdbeiR6DNWLdsS9UDbw==
 -----END CERTIFICATE-----
 
-Endorser 1 signature: 304402203fb7e9e2eb1645e3c08231980b90d6bf766362d0ece53cbe3eec878d98d51bf3022078b19c7909fb7135313cd74878ad9173761b4d033e1598033aae97ae9ebd79b5
+Endorser 1 signature: 3045022100fb2b0eac7a438215496ef29f121847900fafdc3305e84c5e8cb2df4b16b48ff402204411dc7f81db62aacc878d96733a518df0531ef03e2af79ca20fea1e62adc212
 Endorser 1 endorser: mspid Org2MSP 
  certificate -----BEGIN CERTIFICATE-----
-MIICGTCCAcCgAwIBAgIRAKoFq36AGyh9tmw1qzjKp2YwCgYIKoZIzj0EAwIwczEL
+MIICKDCCAc+gAwIBAgIRAKd7Ortw6lNi6RAfMm3fwAkwCgYIKoZIzj0EAwIwczEL
 MAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBG
-cmFuY2lzY28xGTAXBgNVBAoTEG9yZzIuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh
-Lm9yZzIuZXhhbXBsZS5jb20wHhcNMTgwMjI1MTI0MzI5WhcNMjgwMjIzMTI0MzI5
-WjBbMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMN
-U2FuIEZyYW5jaXNjbzEfMB0GA1UEAxMWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBZ
-MBMGByqGSM49AgEGCCqGSM49AwEHA0IABFBM3gDUs/4Mp9DyF/uiUQkQk1UvqmmC
-uhuAXJgeTAob/tzvsLGGRS78dsuPVSGVS3p4vtuPhUBMVKtrnscgjemjTTBLMA4G
-A1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMCsGA1UdIwQkMCKAIHsrdlPEUS1s
-6VNeOBQGNfU5vYoTC+VKyU9+Ext1oPI+MAoGCCqGSM49BAMCA0cAMEQCIDbFc/hr
-0RYfp0e9HqBW+tel9c9VCW7E+C7XO4e7ZYBJAiAVkjEFKpKadLUpA2cK0YHobNRH
-zxIaKjL+wLVfr2wTzQ==
+cmFuY2lzY28xGTAXBgNVBAoTEG9yZzIuZXN1bmVnby5jb20xHDAaBgNVBAMTE2Nh
+Lm9yZzIuZXN1bmVnby5jb20wHhcNMTkxMTAyMTQyMTAwWhcNMjkxMDMwMTQyMTAw
+WjBqMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMN
+U2FuIEZyYW5jaXNjbzENMAsGA1UECxMEcGVlcjEfMB0GA1UEAxMWcGVlcjEub3Jn
+Mi5lc3VuZWdvLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDjBZ5iCDThC
+im9Xur5YYCRLFEFdPgeRRnekqzM8V+i10W5dtBZTEhdbgDDeY3qEHZQ3vQHxufqC
+yJSXbLwvgm+jTTBLMA4GA1UdDwEB/wQEAwIHgDAMBgNVHRMBAf8EAjAAMCsGA1Ud
+IwQkMCKAIGR5emvp0wW4rVDk0gie5bR1oLv3DRFVh09Ef5X3hRf8MAoGCCqGSM49
+BAMCA0cAMEQCIBWz34zoqJNMaLk3FctxUig5Qk7PuYdVmnimu0tw0PMGAiB59riI
+/Uxle8lQbuFEOrMVZc3ki639PKjZGx+iXoRj4g==
 -----END CERTIFICATE-----
 
    Transaction action 1 has 4 chaincode input arguments
@@ -321,47 +327,33 @@ zxIaKjL+wLVfr2wTzQ==
      Namespace example_cc_go write set 1 key b has value '300' 
      Namespace lscc read set 0 key example_cc_go  version [0:0]
      Namespace lscc write set 0 key example_cc_go has value '??example_cc_go??1??escc"?vscc*Z? ??????????????????????????????...' 
-current block number 0 has data hash: 1f97161f511cf90e5ef99372e80d9ab93c008bd5a105367e2513bd9c1606be64
+current block number 0 has data hash: 0d09359c0f494f899ac144dd4d82d0e0085b1d583eb5b80b38788c96f68f0814
 current block number 0 has previous hash id: 
-current block number 0 has calculated block hash is b7d5e295c822c978df1107d07923348abdda0c9e0dfbe2ca109e5ffcd820333c
+current block number 0 has calculated block hash is c7968e5a77a4c5fa8671baf2ee61c51dc92096dcd63a0eaa1ae894e6e1f1abb2
 current block number 0 has 1 envelope count:
   Transaction number 1 has transaction id: 
   Transaction number 1 has channel id: bar
   Transaction number 1 has epoch: 0
-  Transaction number 1 has transaction timestamp: 十月 31,  2019  16:32:35 下午
+  Transaction number 1 has transaction timestamp: 十一月 4,  2019  16:14:39 下午
   Transaction number 1 has type id: ENVELOPE
-  Transaction number 1 has nonce : fb65564058081063a25bd4bc93202424764592b6190cf0b2
+  Transaction number 1 has nonce : 3b9fb9123acf2d200925712c861109c351629694c7ce6cb6
   Transaction number 1 has submitter mspid: OrdererMSP,  certificate: -----BEGIN CERTIFICATE-----
-MIICCzCCAbKgAwIBAgIQUcfZvWT8UgJJ30cDzW15bDAKBggqhkjOPQQDAjBpMQsw
+MIICHTCCAcSgAwIBAgIQCN3yt1Hjlch/Z28NZmYrpDAKBggqhkjOPQQDAjBpMQsw
 CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNU2FuIEZy
-YW5jaXNjbzEUMBIGA1UEChMLZXhhbXBsZS5jb20xFzAVBgNVBAMTDmNhLmV4YW1w
-bGUuY29tMB4XDTE4MDIyNTEyNDMyOVoXDTI4MDIyMzEyNDMyOVowWDELMAkGA1UE
+YW5jaXNjbzEUMBIGA1UEChMLZXN1bmVnby5jb20xFzAVBgNVBAMTDmNhLmVzdW5l
+Z28uY29tMB4XDTE5MTEwMjE0MjEwMFoXDTI5MTAzMDE0MjEwMFowajELMAkGA1UE
 BhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY2lz
-Y28xHDAaBgNVBAMTE29yZGVyZXIuZXhhbXBsZS5jb20wWTATBgcqhkjOPQIBBggq
-hkjOPQMBBwNCAARQfP/qUmnEcXIlE5PlkR4RCMn2XykMsPFZN0k1XfpkSA4KP0nC
-ALUgiITKLsOQohYA7oDaFQD/ZhaRswgwEgmNo00wSzAOBgNVHQ8BAf8EBAMCB4Aw
-DAYDVR0TAQH/BAIwADArBgNVHSMEJDAigCAZtRU3kIVNroUKD5QVcPw8VpuHhyOT
-OtWpwxnSk/LUkjAKBggqhkjOPQQDAgNHADBEAiApAQ0e/qdVsd5qtXGHqYKRt30Y
-LPaGPmy8wbX8+/KDhwIgXtt1TL97Z0rfq7iKXzXLRNk8jNntsrmRFoLVstXr3dA=
+Y28xEDAOBgNVBAsTB29yZGVyZXIxHDAaBgNVBAMTE29yZGVyZXIuZXN1bmVnby5j
+b20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATR3zABaT6hs48lpJzGkkcDv8GY
+/NDYFbR/DgCvm5t4Kfn5ukzv9jiTWQqGzZqJ+4a9IGbM6vIV4TTh2va219MYo00w
+SzAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADArBgNVHSMEJDAigCDcSiqd
+NKaeYpxF44kzo4dGhjzFdMQEo7nDXQLKjhuZ5DAKBggqhkjOPQQDAgNHADBEAiBv
+UmnDSt5ssyCk3hb6YcI3glPgb3wsHam5jxuTFBIDfgIgC6FWxyox41YwzRB2LUnW
+2REOEMxi5tV9X7HqQMtgRBo=
 -----END CERTIFICATE-----
 
 That's all folks!
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 42.957 sec - in org.hyperledger.fabric.sdkintegration.End2endIT
 
-Results :
-
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-
-[INFO] 
-[INFO] --- jacoco-maven-plugin:0.8.2:report (post-unit-test) @ fabric-sdk-java ---
-[INFO] Loading execution data file D:\code\java\fabric-sdk-java\target\coverage-reports\jacoco-ut.exec
-[INFO] Analyzed bundle 'fabric-java-sdk' with 252 classes
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  01:43 min
-[INFO] Finished at: 2019-10-31T16:32:54+08:00
-[INFO] ------------------------------------------------------------------------
 ```
 
 ### 4. 在本地运行NetworkConfigIT单元测试
@@ -377,77 +369,48 @@ Running org.hyperledger.fabric.sdkintegration.NetworkConfigIT
 
 
 
+
 RUNNING: NetworkConfigIT.
 
-2019-10-31 08:34:27,499 main INFO  HFCAClient:594 - CA Name: ca0, Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNRekNDQWVxZ0F3SUJBZ0lSQU0vdmFEdlBzeUlpQzlodm41bm5SOEF3Q2dZSUtvWkl6ajBFQXdJd2N6RUwKTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnVENrTmhiR2xtYjNKdWFXRXhGakFVQmdOVkJBY1REVk5oYmlCRwpjbUZ1WTJselkyOHhHVEFYQmdOVkJBb1RFRzl5WnpFdVpYaGhiWEJzWlM1amIyMHhIREFhQmdOVkJBTVRFMk5oCkxtOXlaekV1WlhoaGJYQnNaUzVqYjIwd0hoY05NVGd3TWpJMU1USTBNekk1V2hjTk1qZ3dNakl6TVRJME16STUKV2pCek1Rc3dDUVlEVlFRR0V3SlZVekVUTUJFR0ExVUVDQk1LUTJGc2FXWnZjbTVwWVRFV01CUUdBMVVFQnhNTgpVMkZ1SUVaeVlXNWphWE5qYnpFWk1CY0dBMVVFQ2hNUWIzSm5NUzVsZUdGdGNHeGxMbU52YlRFY01Cb0dBMVVFCkF4TVRZMkV1YjNKbk1TNWxlR0Z0Y0d4bExtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUEKQkxxSTlkWDdkOU5HbzNndUw1RlA4b3RHc2lCak43QnpkNmRHL0NheUpEZmpOUkczNFlPOHQyOTl1NkVvRlh2egpwY2pBTUd1MFVLVHJ6TWZjeU91emNNeWpYekJkTUE0R0ExVWREd0VCL3dRRUF3SUJwakFQQmdOVkhTVUVDREFHCkJnUlZIU1VBTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3S1FZRFZSME9CQ0lFSUxITU5NUHkwTStBZUdqNk9ob1IKaDAwZ1FUQ0VYOWp1czIwdVdVVFhkbmNjTUFvR0NDcUdTTTQ5QkFNQ0EwY0FNRVFDSUY3V2wzQTExekVOcjFDbwpxR3l1M2g0ZkN1a2t0RlZ5Ry9XUEpVeWxWWGpJQWlCOUxqcFhtOUVSZ0pNZlpzakRJekNqOU00YVF1Vk45WExrClhueDB1b0t6N2c9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIDwI9XgGar29lWsgJQ5P++7nzIIlwWWGLEJ51ykde2A1EiCqCseWTnj4fux5l9ozepRqBhlZDfRZQFOKy755TIRikhpECiBvNt5Wcruon1yTI2OEtyActT1S0GLFcfCWXRMFykliiBIgL2P8/HJvbEI5pLb0LgoTUA1JDYYS+/MKC5irpY6t25wiRAogCAVRXVLX9SAwPD64Io0XEBFzpU0AOLnlUO84CJEN/XMSINGlHg7UFotyrB8gssFv3O56azHl+2X+k0nC2fS4IJY7IkQKILXIuSKsaLPOEnzyALvLpiW5rwRrAZZGHtkGx4CDUyY3EiDTMRCTEROrAXB/ZINA+RP3FzeUgnDLxLOes+OubkOQIyJECiA0wS8aoljJ6XkaAm6viC3+OY1WhN+zlEgfckCrIeFzixIgOKoxJtgZrFma+LPjLye6/RYlejeNegmSePueBMhOctYiRAogP3UpF6MJUiwgP1WAEdcEUmA1qBzM/pnh/P4DvTClVNsSII0ME/JUvx2G/KanqXhHSdiOPO8JMvl/oT9j86NE5acMKogBCiAkGHyPPIpfZ62j37rU+vuyhyVn3GTzHxzfENb4L81d9hIg4lovQafbr+EQ8oOgJNQYJTNoxrwt03gX0KoS351tA9AaIAprAFVW8Rj/oz5qv8EgezttuHVW6CeYxhClVaUXgkv8IiCB5IQt3kHBcfaLZ0G6T07NcgX0yEcLq/SCjjIzC+OMITJECiBjX+SptFK5yiKrp6p2unJEQzicZrOl7pcjQaYCRscHxBIgNa9BFzQiJmywsmJlMcjSexW66XrrJZzTGZIGjeuiobU6RAogiyMMfc2QIHR94xmd+qIfFFeu8C0G3x/as3asLSH63YcSIEPbCHzdb/sMxS5h42sPx+bhLbJ0UzYMapdOKilxyluFQiC+JXB0Nrg+JUDkXOO30VuNa1OWTaY+uui66lvI59+s/EogS5zQNR8QLbjptQUWittI672tran5xUvtidx7QeTSjQVSIHRZz7ANrFN/racCNVLnIrCqzxKU+QGje3+AuKvFasmy, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVVeWpzYmtvL2kxSUg0ZEEvOURBeE15RW9YUFczVTRJRQpaMUh2K0VmWXhka1IrWWRLdzVYb09BeGRvVnl0blUzZzJNTStTZ01XK1QyZnZNVHQxOHR3QkVITVRQZnE1VHBoCmZ1VExVaitvSVJFbEFXSkNsOW44cTVRcWFLWjZaekNlCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
-2019-10-31 08:34:28,415 main INFO  HFCAClient:594 - CA Name: ca0, Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNRekNDQWVxZ0F3SUJBZ0lSQU0vdmFEdlBzeUlpQzlodm41bm5SOEF3Q2dZSUtvWkl6ajBFQXdJd2N6RUwKTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnVENrTmhiR2xtYjNKdWFXRXhGakFVQmdOVkJBY1REVk5oYmlCRwpjbUZ1WTJselkyOHhHVEFYQmdOVkJBb1RFRzl5WnpFdVpYaGhiWEJzWlM1amIyMHhIREFhQmdOVkJBTVRFMk5oCkxtOXlaekV1WlhoaGJYQnNaUzVqYjIwd0hoY05NVGd3TWpJMU1USTBNekk1V2hjTk1qZ3dNakl6TVRJME16STUKV2pCek1Rc3dDUVlEVlFRR0V3SlZVekVUTUJFR0ExVUVDQk1LUTJGc2FXWnZjbTVwWVRFV01CUUdBMVVFQnhNTgpVMkZ1SUVaeVlXNWphWE5qYnpFWk1CY0dBMVVFQ2hNUWIzSm5NUzVsZUdGdGNHeGxMbU52YlRFY01Cb0dBMVVFCkF4TVRZMkV1YjNKbk1TNWxlR0Z0Y0d4bExtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUEKQkxxSTlkWDdkOU5HbzNndUw1RlA4b3RHc2lCak43QnpkNmRHL0NheUpEZmpOUkczNFlPOHQyOTl1NkVvRlh2egpwY2pBTUd1MFVLVHJ6TWZjeU91emNNeWpYekJkTUE0R0ExVWREd0VCL3dRRUF3SUJwakFQQmdOVkhTVUVDREFHCkJnUlZIU1VBTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3S1FZRFZSME9CQ0lFSUxITU5NUHkwTStBZUdqNk9ob1IKaDAwZ1FUQ0VYOWp1czIwdVdVVFhkbmNjTUFvR0NDcUdTTTQ5QkFNQ0EwY0FNRVFDSUY3V2wzQTExekVOcjFDbwpxR3l1M2g0ZkN1a2t0RlZ5Ry9XUEpVeWxWWGpJQWlCOUxqcFhtOUVSZ0pNZlpzakRJekNqOU00YVF1Vk45WExrClhueDB1b0t6N2c9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIDwI9XgGar29lWsgJQ5P++7nzIIlwWWGLEJ51ykde2A1EiCqCseWTnj4fux5l9ozepRqBhlZDfRZQFOKy755TIRikhpECiBvNt5Wcruon1yTI2OEtyActT1S0GLFcfCWXRMFykliiBIgL2P8/HJvbEI5pLb0LgoTUA1JDYYS+/MKC5irpY6t25wiRAogCAVRXVLX9SAwPD64Io0XEBFzpU0AOLnlUO84CJEN/XMSINGlHg7UFotyrB8gssFv3O56azHl+2X+k0nC2fS4IJY7IkQKILXIuSKsaLPOEnzyALvLpiW5rwRrAZZGHtkGx4CDUyY3EiDTMRCTEROrAXB/ZINA+RP3FzeUgnDLxLOes+OubkOQIyJECiA0wS8aoljJ6XkaAm6viC3+OY1WhN+zlEgfckCrIeFzixIgOKoxJtgZrFma+LPjLye6/RYlejeNegmSePueBMhOctYiRAogP3UpF6MJUiwgP1WAEdcEUmA1qBzM/pnh/P4DvTClVNsSII0ME/JUvx2G/KanqXhHSdiOPO8JMvl/oT9j86NE5acMKogBCiAkGHyPPIpfZ62j37rU+vuyhyVn3GTzHxzfENb4L81d9hIg4lovQafbr+EQ8oOgJNQYJTNoxrwt03gX0KoS351tA9AaIAprAFVW8Rj/oz5qv8EgezttuHVW6CeYxhClVaUXgkv8IiCB5IQt3kHBcfaLZ0G6T07NcgX0yEcLq/SCjjIzC+OMITJECiBjX+SptFK5yiKrp6p2unJEQzicZrOl7pcjQaYCRscHxBIgNa9BFzQiJmywsmJlMcjSexW66XrrJZzTGZIGjeuiobU6RAogiyMMfc2QIHR94xmd+qIfFFeu8C0G3x/as3asLSH63YcSIEPbCHzdb/sMxS5h42sPx+bhLbJ0UzYMapdOKilxyluFQiC+JXB0Nrg+JUDkXOO30VuNa1OWTaY+uui66lvI59+s/EogS5zQNR8QLbjptQUWittI672tran5xUvtidx7QeTSjQVSIHRZz7ANrFN/racCNVLnIrCqzxKU+QGje3+AuKvFasmy, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVVeWpzYmtvL2kxSUg0ZEEvOURBeE15RW9YUFczVTRJRQpaMUh2K0VmWXhka1IrWWRLdzVYb09BeGRvVnl0blUzZzJNTStTZ01XK1QyZnZNVHQxOHR3QkVITVRQZnE1VHBoCmZ1VExVaitvSVJFbEFXSkNsOW44cTVRcWFLWjZaekNlCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
-2019-10-31 08:34:28,417 main INFO  HFCAClient:1542 - CA Version: 1.4.3
-2019-10-31 08:34:29,098 main INFO  HFCAClient:594 - CA Name: , Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNRakNDQWVtZ0F3SUJBZ0lRQTUxUzVhVjhPRktUREVrQURhL0I0VEFLQmdncWhrak9QUVFEQWpCek1Rc3cKQ1FZRFZRUUdFd0pWVXpFVE1CRUdBMVVFQ0JNS1EyRnNhV1p2Y201cFlURVdNQlFHQTFVRUJ4TU5VMkZ1SUVaeQpZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTWk1bGVHRnRjR3hsTG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1CmIzSm5NaTVsZUdGdGNHeGxMbU52YlRBZUZ3MHhPREF5TWpVeE1qUXpNamxhRncweU9EQXlNak14TWpRek1qbGEKTUhNeEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUlFd3BEWVd4cFptOXlibWxoTVJZd0ZBWURWUVFIRXcxVApZVzRnUm5KaGJtTnBjMk52TVJrd0Z3WURWUVFLRXhCdmNtY3lMbVY0WVcxd2JHVXVZMjl0TVJ3d0dnWURWUVFECkV4TmpZUzV2Y21jeUxtVjRZVzF3YkdVdVkyOXRNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUUKWDcxcjVqUE5WWUwrQ3FPSDFXWlhZNmJ2ZXBReUxGUkVIdFVzT3VYRmZqbGVycEd3a1BWSk5pcERaVWlmVFJTOAppbWZqK3M2dHg1cFJKZHk4YldESVZhTmZNRjB3RGdZRFZSMFBBUUgvQkFRREFnR21NQThHQTFVZEpRUUlNQVlHCkJGVWRKUUF3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFwQmdOVkhRNEVJZ1FnZXl0MlU4UlJMV3pwVTE0NEZBWTEKOVRtOWloTUw1VXJKVDM0VEczV2c4ajR3Q2dZSUtvWkl6ajBFQXdJRFJ3QXdSQUlnY20vOEFGdms3OXBaekhCdQo3dEV6WXhwTTk5QWpIbkk3bFF1Z2F5b0QrMkFDSUQ2c2dmTk56RWdSbS81aVpBRGVMQVBpb1VpQkpVcUFJV1lxCkhLYWxkWnBiCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIKUN1bxKXUsUNOy+bfScpF2LI3sPbJ6LX0LLIlXSuLgAEiB/qs9QkyV/5tIw2YPvFbUCsXLQk1NXOQZ+RxPM6YVtoBpECiBPeZPNPzi1vI7bw5YBvJeTOdOBO0gt/ZlIsn3uV/uPIRIgSXkrGdp/DOfpPDT2nRQh+leoXzxmB7BbO6iTZF1I6LgiRAogyvToDr9W4PgKW1cEO/LoPk9Hl0R9CgUlBTBimT3qqVISICC3xNHi9Q0P/H9DebPXiqQzKhq8uK20ZFlgLLzg1dUVIkQKIKSwLtmjfeVVsYgtGxIO+TEOwqxgc0fSKW06t2ix90C3EiABoRYyojpG96USz5VSgqhwiGUwGF1yasXK4rUFPqdHtCJECiDpPEL4uY5ua8X15HClIuj5XqmlhM27PbDiPMlU67ySQBIg2UUaB2RdOKSfzDPGPmJFzp6W1ITZhU/yHrqj1JeV5/MiRAogj0GBMlvZd7laaacSt1QPl2OLPCEele8RuW/0ZjOM0rMSIBYSJHFQzcKCtfTZSnqy8jTsUxdUaNZPOEaJwTQWwIEUKogBCiDIB3FLD2NlcDCHKUj9YiuKTzfvmKiXBaQI7nK/FQzyghIgoSQL4DaPx45ZmTSM25ZMZ0lUhLud2xFGN461WmjS9/0aINp2Tn0FVlkgq1ziFEkTjqNf0TtdpmeBdKz9NSPuiOEgIiD91wH9nsr1Luq9EppzmfeigiUYnkHqF98EjHWJuUjCGTJECiBDum1pl02apBwaDJIsIkfQ/0EcDGCmnjf5/s92xsDezxIg8c0IcNQjkf8H+OaEQ++R6Bs3XizBKzgdk1YOCGG3SvU6RAogmcVXh2wtQs6ex4T6D1GPFQeb3vX5p7LxXcoc8LNsDlcSIEPtAmlOwOU0BmodnqUvJR2kgAjymC7ciQ8z9E9Z+Up/QiB/RZnDddQpHKAFKJoNBaYqz/Jos24GNAKb+hJfrlF8N0ogkdLAh3B2lSWCpzDJliL7wATU9OIvjnZ4VmzQPX8xha1SIIQ6XWpZn5NGEMPdfoKXn262cOdbyiKjTLa+4nXEc0wy, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUU2bGtLdlNhMWY1RnJLMHZXVENieEFMbnhlRXFYZ3dKawpBYzk4bHVwWG5GQmNhMjdHWEp5Z0lqMnNLM0Q5UHd6QTVYeHQzeTRVS215SFFTUGhJU2Y1Nnh2c08xRlV6cUQ4CjlPSHpCUGpQdXhsRnl5SG5Uems2bFJRQ2dBVU1HcmZMCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
-2019-10-31 08:34:29,508 main INFO  HFCAClient:594 - CA Name: , Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNRakNDQWVtZ0F3SUJBZ0lRQTUxUzVhVjhPRktUREVrQURhL0I0VEFLQmdncWhrak9QUVFEQWpCek1Rc3cKQ1FZRFZRUUdFd0pWVXpFVE1CRUdBMVVFQ0JNS1EyRnNhV1p2Y201cFlURVdNQlFHQTFVRUJ4TU5VMkZ1SUVaeQpZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTWk1bGVHRnRjR3hsTG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1CmIzSm5NaTVsZUdGdGNHeGxMbU52YlRBZUZ3MHhPREF5TWpVeE1qUXpNamxhRncweU9EQXlNak14TWpRek1qbGEKTUhNeEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUlFd3BEWVd4cFptOXlibWxoTVJZd0ZBWURWUVFIRXcxVApZVzRnUm5KaGJtTnBjMk52TVJrd0Z3WURWUVFLRXhCdmNtY3lMbVY0WVcxd2JHVXVZMjl0TVJ3d0dnWURWUVFECkV4TmpZUzV2Y21jeUxtVjRZVzF3YkdVdVkyOXRNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUUKWDcxcjVqUE5WWUwrQ3FPSDFXWlhZNmJ2ZXBReUxGUkVIdFVzT3VYRmZqbGVycEd3a1BWSk5pcERaVWlmVFJTOAppbWZqK3M2dHg1cFJKZHk4YldESVZhTmZNRjB3RGdZRFZSMFBBUUgvQkFRREFnR21NQThHQTFVZEpRUUlNQVlHCkJGVWRKUUF3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFwQmdOVkhRNEVJZ1FnZXl0MlU4UlJMV3pwVTE0NEZBWTEKOVRtOWloTUw1VXJKVDM0VEczV2c4ajR3Q2dZSUtvWkl6ajBFQXdJRFJ3QXdSQUlnY20vOEFGdms3OXBaekhCdQo3dEV6WXhwTTk5QWpIbkk3bFF1Z2F5b0QrMkFDSUQ2c2dmTk56RWdSbS81aVpBRGVMQVBpb1VpQkpVcUFJV1lxCkhLYWxkWnBiCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIKUN1bxKXUsUNOy+bfScpF2LI3sPbJ6LX0LLIlXSuLgAEiB/qs9QkyV/5tIw2YPvFbUCsXLQk1NXOQZ+RxPM6YVtoBpECiBPeZPNPzi1vI7bw5YBvJeTOdOBO0gt/ZlIsn3uV/uPIRIgSXkrGdp/DOfpPDT2nRQh+leoXzxmB7BbO6iTZF1I6LgiRAogyvToDr9W4PgKW1cEO/LoPk9Hl0R9CgUlBTBimT3qqVISICC3xNHi9Q0P/H9DebPXiqQzKhq8uK20ZFlgLLzg1dUVIkQKIKSwLtmjfeVVsYgtGxIO+TEOwqxgc0fSKW06t2ix90C3EiABoRYyojpG96USz5VSgqhwiGUwGF1yasXK4rUFPqdHtCJECiDpPEL4uY5ua8X15HClIuj5XqmlhM27PbDiPMlU67ySQBIg2UUaB2RdOKSfzDPGPmJFzp6W1ITZhU/yHrqj1JeV5/MiRAogj0GBMlvZd7laaacSt1QPl2OLPCEele8RuW/0ZjOM0rMSIBYSJHFQzcKCtfTZSnqy8jTsUxdUaNZPOEaJwTQWwIEUKogBCiDIB3FLD2NlcDCHKUj9YiuKTzfvmKiXBaQI7nK/FQzyghIgoSQL4DaPx45ZmTSM25ZMZ0lUhLud2xFGN461WmjS9/0aINp2Tn0FVlkgq1ziFEkTjqNf0TtdpmeBdKz9NSPuiOEgIiD91wH9nsr1Luq9EppzmfeigiUYnkHqF98EjHWJuUjCGTJECiBDum1pl02apBwaDJIsIkfQ/0EcDGCmnjf5/s92xsDezxIg8c0IcNQjkf8H+OaEQ++R6Bs3XizBKzgdk1YOCGG3SvU6RAogmcVXh2wtQs6ex4T6D1GPFQeb3vX5p7LxXcoc8LNsDlcSIEPtAmlOwOU0BmodnqUvJR2kgAjymC7ciQ8z9E9Z+Up/QiB/RZnDddQpHKAFKJoNBaYqz/Jos24GNAKb+hJfrlF8N0ogkdLAh3B2lSWCpzDJliL7wATU9OIvjnZ4VmzQPX8xha1SIIQ6XWpZn5NGEMPdfoKXn262cOdbyiKjTLa+4nXEc0wy, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUU2bGtLdlNhMWY1RnJLMHZXVENieEFMbnhlRXFYZ3dKawpBYzk4bHVwWG5GQmNhMjdHWEp5Z0lqMnNLM0Q5UHd6QTVYeHQzeTRVS215SFFTUGhJU2Y1Nnh2c08xRlV6cUQ4CjlPSHpCUGpQdXhsRnl5SG5Uems2bFJRQ2dBVU1HcmZMCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
-2019-10-31 08:34:29,509 main INFO  HFCAClient:1542 - CA Version: 1.4.3
-2019-10-31 08:34:36,610 main INFO  Channel:1259 - Channel Channel{id: 1, name: foo} eventThread started shutdown: false  thread: null 
-Checking instantiated chaincode: cc-NetworkConfigTest-001, at version: 1, on peer: peer0.org1.example.com
-deployChaincode - enter
-deployChaincode - channelName = foo
-Creating install proposal
-Sending install proposal
-2019-10-31 08:34:36,764 main INFO  InstallProposalBuilder:243 - Installing 'cc-NetworkConfigTest-001::github.com/example_cc::1' language Go chaincode from directory: 'D:\code\java\fabric-sdk-java\src\test\fixture\sdkintegration\gocc\sample1\src\github.com\example_cc' with source location: 'src\github.com\example_cc'. chaincodePath:'github.com/example_cc'
-Successful install proposal response Txid: 722e80d8ad564143779e024adf4a0fed311f65a4b7e54ce0c2ad894589cd6a39 from peer peer0.org1.example.com
-Successful install proposal response Txid: 722e80d8ad564143779e024adf4a0fed311f65a4b7e54ce0c2ad894589cd6a39 from peer peer1.org1.example.com
-Received 2 install proposal responses. Successful+verified: 2 . Failed: 0
-Sending instantiateProposalRequest to all peers...
-Succesful instantiate proposal response Txid: 174052c470cc369335033a1c44c956c9f9941de7b2012c95d11e44d4c3a74776 from peer peer0.org1.example.com
-Succesful instantiate proposal response Txid: 174052c470cc369335033a1c44c956c9f9941de7b2012c95d11e44d4c3a74776 from peer peer1.org1.example.com
-Received 2 instantiate proposal responses. Successful+verified: 2 . Failed: 0
-Sending instantiateTransaction to orderer...
-calling get...
-get done...
-Finished instantiate transaction with transaction id 174052c470cc369335033a1c44c956c9f9941de7b2012c95d11e44d4c3a74776
-2019-10-31 08:34:57,924 main INFO  Channel:1259 - Channel Channel{id: 11, name: foo} eventThread started shutdown: false  thread: null 
+2019-11-04 08:45:39,992 main INFO  HFCAClient:594 - CA Name: ca0, Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNVRENDQWZlZ0F3SUJBZ0lRR3MrSEJlNUZWWEJjb3RPV0JzbkZFVEFLQmdncWhrak9QUVFEQWpCek1Rc3cKQ1FZRFZRUUdFd0pWVXpFVE1CRUdBMVVFQ0JNS1EyRnNhV1p2Y201cFlURVdNQlFHQTFVRUJ4TU5VMkZ1SUVaeQpZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTVM1bGMzVnVaV2R2TG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1CmIzSm5NUzVsYzNWdVpXZHZMbU52YlRBZUZ3MHhPVEV4TURJeE5ESXhNREJhRncweU9URXdNekF4TkRJeE1EQmEKTUhNeEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUlFd3BEWVd4cFptOXlibWxoTVJZd0ZBWURWUVFIRXcxVApZVzRnUm5KaGJtTnBjMk52TVJrd0Z3WURWUVFLRXhCdmNtY3hMbVZ6ZFc1bFoyOHVZMjl0TVJ3d0dnWURWUVFECkV4TmpZUzV2Y21jeExtVnpkVzVsWjI4dVkyOXRNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUUKVG8wR0Ivd1crS3ZESTZ0bHh0ZDRjOXJsanh0L2d0dHMyYTI2T01hMFVKeEJtblZvNytadkY3TVVOWjgvb3lxcgpYb0gwN2tOV1l1MGhrczJNRmxFamY2TnRNR3N3RGdZRFZSMFBBUUgvQkFRREFnR21NQjBHQTFVZEpRUVdNQlFHCkNDc0dBUVVGQndNQ0JnZ3JCZ0VGQlFjREFUQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01Da0dBMVVkRGdRaUJDQ0UKRllteVhkdHh6UEFzenA5bFRBdDdKN0hXYXlkUlZaNG5GbmNJSXoxeC96QUtCZ2dxaGtqT1BRUURBZ05IQURCRQpBaUFzMGFuR2Rpb0RKQ2kxQ2NGZVlIYnorbE9TcXllUGZ6a3pxVTVUdmFUMDFnSWdiQkttVXE0WFIvYTUyQXI2ClhCcldtMHNVdVJZamt2MTkvWExRcVpaUEpCbz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKILkzRpZOfQ3oMK/8O2TVp54NeiHNrlGr2OyKd0MfOul+EiC6V5v6BuomsGIh+0bNU6MR4FLKrJPmIQPrbEPALgDJCBpECiBRyCaKduiODTKUmBKkOr5mvml4QlPuHcQkIsrQbBWKOBIgPXmPEj4X7IP7YkMuoH/ifER1b4UEn/jHmfX3zKaBFd8iRAogMMbDLvF2D5F6ZzLX2qjR09/TixRiRLQg/AX3obIZg0YSICbkpSpVrkQ7/91FYABtw0koQIBQVchykiRMDYVhobadIkQKIMADgWabzyirgO3c2/tQ/8uTSLO1RLebVEXbxe9FKAZmEiBogGbaLjapkZdYf1eZ07jyaObxaMzVmF616MabSWpK1yJECiBvYZbT7MPwrkaUthsplvUScmoCMO17Ltn+k7RDaFd0xBIguemzpx2tQQxetOCwYM9pzSe+UC+opnRXHHK77xj7JG4iRAognDJK1kXpb5PD6kSNzAr0qT44hKyOSfERqohmdFaYqVgSIHOYDT6LmmX6Eg11vkPHv1X1OuPILhFpnIiyGRYWgxp3KogBCiAInOGaHKaP7wxG1k3qiI8ibjG13Z8/1r9B5OjUzyO7LhIgJRV1y7l4O2Oj1YpX/8MEsqY29KprLDuwyIszra02b8waIJLGgydrcW+FI/P25jQioINBxAnPiKZpvYoc3Z6lYVr4IiAvaZHy2yJdBTsg6ezGI+5hwz+bX7eWQspGmQ2xpOFrAjJECiAalaiI0jjM8RtHOjjbZLs269j9V1eLOzJpF7zBa1eyzhIgs0tJQn31Z4uZu2lobhUXRdlZOMqc363eGsWGPKQbggE6RAog9+qGoJGPO7M888tlnYyPZKxqQecd8YXIBU4DkMXH5HQSII0lkif6hdRxvK+eMGE0tDeRqWrpVNuOKpgbtxi5OYgeQiDSPLDMOp1sUgceFzUg2ywGpYdh84fqMQQBQYRItsBcKEogG8RFO30KzMmV6t2MUY8B5BDjPxkLVEE09mo/yVZTQIRSIO/UtxP0PBRmOZXsn2gBLDStXa+WsNPfHc1N1x6sj89H, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVyUTYwNmowaEw2TGVYaWIyN2ZBNUVsSzBkVjRkdEVHSwpYR2lmbDRpdWFPcEVpSmdxVkYyR2Y1cjdDbjJGK2lNR0tXMEplb2M0cU9nb1UvR212TXk4bmtWUHBabEhKKzl3CmQ0ZzFSVXY1NjNGMmdYN2Z5RlJFTlM1NFlMelNMZnR2Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
+2019-11-04 08:45:40,599 main INFO  HFCAClient:594 - CA Name: ca0, Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNVRENDQWZlZ0F3SUJBZ0lRR3MrSEJlNUZWWEJjb3RPV0JzbkZFVEFLQmdncWhrak9QUVFEQWpCek1Rc3cKQ1FZRFZRUUdFd0pWVXpFVE1CRUdBMVVFQ0JNS1EyRnNhV1p2Y201cFlURVdNQlFHQTFVRUJ4TU5VMkZ1SUVaeQpZVzVqYVhOamJ6RVpNQmNHQTFVRUNoTVFiM0puTVM1bGMzVnVaV2R2TG1OdmJURWNNQm9HQTFVRUF4TVRZMkV1CmIzSm5NUzVsYzNWdVpXZHZMbU52YlRBZUZ3MHhPVEV4TURJeE5ESXhNREJhRncweU9URXdNekF4TkRJeE1EQmEKTUhNeEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUlFd3BEWVd4cFptOXlibWxoTVJZd0ZBWURWUVFIRXcxVApZVzRnUm5KaGJtTnBjMk52TVJrd0Z3WURWUVFLRXhCdmNtY3hMbVZ6ZFc1bFoyOHVZMjl0TVJ3d0dnWURWUVFECkV4TmpZUzV2Y21jeExtVnpkVzVsWjI4dVkyOXRNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUUKVG8wR0Ivd1crS3ZESTZ0bHh0ZDRjOXJsanh0L2d0dHMyYTI2T01hMFVKeEJtblZvNytadkY3TVVOWjgvb3lxcgpYb0gwN2tOV1l1MGhrczJNRmxFamY2TnRNR3N3RGdZRFZSMFBBUUgvQkFRREFnR21NQjBHQTFVZEpRUVdNQlFHCkNDc0dBUVVGQndNQ0JnZ3JCZ0VGQlFjREFUQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01Da0dBMVVkRGdRaUJDQ0UKRllteVhkdHh6UEFzenA5bFRBdDdKN0hXYXlkUlZaNG5GbmNJSXoxeC96QUtCZ2dxaGtqT1BRUURBZ05IQURCRQpBaUFzMGFuR2Rpb0RKQ2kxQ2NGZVlIYnorbE9TcXllUGZ6a3pxVTVUdmFUMDFnSWdiQkttVXE0WFIvYTUyQXI2ClhCcldtMHNVdVJZamt2MTkvWExRcVpaUEpCbz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKILkzRpZOfQ3oMK/8O2TVp54NeiHNrlGr2OyKd0MfOul+EiC6V5v6BuomsGIh+0bNU6MR4FLKrJPmIQPrbEPALgDJCBpECiBRyCaKduiODTKUmBKkOr5mvml4QlPuHcQkIsrQbBWKOBIgPXmPEj4X7IP7YkMuoH/ifER1b4UEn/jHmfX3zKaBFd8iRAogMMbDLvF2D5F6ZzLX2qjR09/TixRiRLQg/AX3obIZg0YSICbkpSpVrkQ7/91FYABtw0koQIBQVchykiRMDYVhobadIkQKIMADgWabzyirgO3c2/tQ/8uTSLO1RLebVEXbxe9FKAZmEiBogGbaLjapkZdYf1eZ07jyaObxaMzVmF616MabSWpK1yJECiBvYZbT7MPwrkaUthsplvUScmoCMO17Ltn+k7RDaFd0xBIguemzpx2tQQxetOCwYM9pzSe+UC+opnRXHHK77xj7JG4iRAognDJK1kXpb5PD6kSNzAr0qT44hKyOSfERqohmdFaYqVgSIHOYDT6LmmX6Eg11vkPHv1X1OuPILhFpnIiyGRYWgxp3KogBCiAInOGaHKaP7wxG1k3qiI8ibjG13Z8/1r9B5OjUzyO7LhIgJRV1y7l4O2Oj1YpX/8MEsqY29KprLDuwyIszra02b8waIJLGgydrcW+FI/P25jQioINBxAnPiKZpvYoc3Z6lYVr4IiAvaZHy2yJdBTsg6ezGI+5hwz+bX7eWQspGmQ2xpOFrAjJECiAalaiI0jjM8RtHOjjbZLs269j9V1eLOzJpF7zBa1eyzhIgs0tJQn31Z4uZu2lobhUXRdlZOMqc363eGsWGPKQbggE6RAog9+qGoJGPO7M888tlnYyPZKxqQecd8YXIBU4DkMXH5HQSII0lkif6hdRxvK+eMGE0tDeRqWrpVNuOKpgbtxi5OYgeQiDSPLDMOp1sUgceFzUg2ywGpYdh84fqMQQBQYRItsBcKEogG8RFO30KzMmV6t2MUY8B5BDjPxkLVEE09mo/yVZTQIRSIO/UtxP0PBRmOZXsn2gBLDStXa+WsNPfHc1N1x6sj89H, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVyUTYwNmowaEw2TGVYaWIyN2ZBNUVsSzBkVjRkdEVHSwpYR2lmbDRpdWFPcEVpSmdxVkYyR2Y1cjdDbjJGK2lNR0tXMEplb2M0cU9nb1UvR212TXk4bmtWUHBabEhKKzl3CmQ0ZzFSVXY1NjNGMmdYN2Z5RlJFTlM1NFlMelNMZnR2Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
+2019-11-04 08:45:40,599 main INFO  HFCAClient:1542 - CA Version: 1.4.3
+2019-11-04 08:45:41,137 main INFO  HFCAClient:594 - CA Name: , Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNVVENDQWZpZ0F3SUJBZ0lSQUtMMGRNWHdQU0JTNkNzNS9YdVdyWWt3Q2dZSUtvWkl6ajBFQXdJd2N6RUwKTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnVENrTmhiR2xtYjNKdWFXRXhGakFVQmdOVkJBY1REVk5oYmlCRwpjbUZ1WTJselkyOHhHVEFYQmdOVkJBb1RFRzl5WnpJdVpYTjFibVZuYnk1amIyMHhIREFhQmdOVkJBTVRFMk5oCkxtOXlaekl1WlhOMWJtVm5ieTVqYjIwd0hoY05NVGt4TVRBeU1UUXlNVEF3V2hjTk1qa3hNRE13TVRReU1UQXcKV2pCek1Rc3dDUVlEVlFRR0V3SlZVekVUTUJFR0ExVUVDQk1LUTJGc2FXWnZjbTVwWVRFV01CUUdBMVVFQnhNTgpVMkZ1SUVaeVlXNWphWE5qYnpFWk1CY0dBMVVFQ2hNUWIzSm5NaTVsYzNWdVpXZHZMbU52YlRFY01Cb0dBMVVFCkF4TVRZMkV1YjNKbk1pNWxjM1Z1WldkdkxtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUEKQlBma3pVM0E2eDMzQTFyem9Fb3VTVjhmdUJyRU9kblhobGJKdUJIcm1qNXlsbmFzL1RLWXR3THQ2V1dTekdsMwoxSm5iYXV0Mldxa0VlMUVsS2crQTV4U2piVEJyTUE0R0ExVWREd0VCL3dRRUF3SUJwakFkQmdOVkhTVUVGakFVCkJnZ3JCZ0VGQlFjREFnWUlLd1lCQlFVSEF3RXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXBCZ05WSFE0RUlnUWcKWkhsNmErblRCYml0VU9UU0NKN2x0SFdndS9jTkVWV0hUMFIvbGZlRkYvd3dDZ1lJS29aSXpqMEVBd0lEUndBdwpSQUlnT2ZTcGRsWmY1eVhGa1hySlFPT0F0R2xtRWxPclRvMm9pQVhNVnczQkZkNENJQVljWjhVeEs3YUo3UmdQCjJjei9uUVRDZWsvZ1k1Z1p6NXpTNjBtc0xScHEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIG5Ux1pOGqdhxdZNXXMLTgjhn+9RjjbT6MQE9ST63s0IEiBO+nvhC7NBJtaRzDiQ0hrlipfqUP6uf0z6HgUd2L9x0xpECiByC2wbbF578jlkHX82sR+4FeAjQ7nbTiUQpjmmbqWE9xIgr/VguRnC4ZPM2owgCsLj/npmzXUDtwJb7+bH1uQ2sxsiRAogG15xhAeI8WRTQvXaG/BpUxvWU+LAvqS2+kbkhY9GMKoSICd6old9vBj0csnBNl0WG+hlhoExYjabZRCpipdL1brpIkQKIKrC2JKZk4NnxICmcOkQ3R37dwvc7RUhTb5kJgyjXdirEiCpuLrX+lThe3IYIiFO9SeZhJIUSvI8RqNUdNaGlUZmtCJECiBq2x37CEK1C5kzcqo/HKaJ3FPlkMS9sLv8epd7rDW00xIgotZFwKD/y6+mBahnM/rGKw7aMT4r/PQxl7cONo6vM5ciRAogZIjy9X2eIO9YjTHZsWW8jn9nv0BR0QWDnWoY3l9jKVsSIAxylDIS10iq/tUlXpSTllVo22DwGsQ7wwORPBr0DhoDKogBCiC3jSYjtP8VrXgtqZ6ADTJjpWz2HSg09thTRhhO45JfnhIgyp1wlQsJPGeJOxCFfXgWCw8YQ18hjNOhF8a+xBvG8PgaIAD0HUvs66/1/PlI1j0zCaj/2v+XVRRHaatRubfygqs4IiC8Gok5ZvCUwMD/psolXzmUDmB7YPZh1nr9jZwmScBs7jJECiCa+anLdJjYNyTesIaDj2A1W5GH1S/9Cf0Mo+R2dw6F1BIgQR4NdVpu4qOiDztDcZGiNK9K8csCYiowCw3/wQechqk6RAogZLvHGDzQMI7rg4fnCz7ucWIxx3sO/kK8pc5qdZBjP2ISIJabbIOfRdC2TCmGlKkJwnR/nNXkW7YkNXjbBZOIB4oHQiAWNcuepx/SIDAE/QGVhGzGZz7kQYcV51vOsCCmic53hUogDf4oj5DVox6CiCe+oD5JrceUgC7h2Rb9jlgLbeWtooBSIKcaZ2Ls/dqcgC+h4/qSVzKfcfnmDyPAiE5YP32OWqYh, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVFSGFwdmJRcGNHbm04VTUzM0prY2pSZk9HTXBJaEJ5NQpWbFA3b29XM0RXWU5tRVlmR3pWSXBTZ1Rhb3ZoYzI4ZlcwT1Q0K05Dclh5S0hjakZtWGh4Z0xxaktKTHdlZUl6CmJpVElJRWlXVTJNcXkzY0dNMGlkalpSbFNtTmk0UGx3Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
+2019-11-04 08:45:41,514 main INFO  HFCAClient:594 - CA Name: , Version: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNVVENDQWZpZ0F3SUJBZ0lSQUtMMGRNWHdQU0JTNkNzNS9YdVdyWWt3Q2dZSUtvWkl6ajBFQXdJd2N6RUwKTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnVENrTmhiR2xtYjNKdWFXRXhGakFVQmdOVkJBY1REVk5oYmlCRwpjbUZ1WTJselkyOHhHVEFYQmdOVkJBb1RFRzl5WnpJdVpYTjFibVZuYnk1amIyMHhIREFhQmdOVkJBTVRFMk5oCkxtOXlaekl1WlhOMWJtVm5ieTVqYjIwd0hoY05NVGt4TVRBeU1UUXlNVEF3V2hjTk1qa3hNRE13TVRReU1UQXcKV2pCek1Rc3dDUVlEVlFRR0V3SlZVekVUTUJFR0ExVUVDQk1LUTJGc2FXWnZjbTVwWVRFV01CUUdBMVVFQnhNTgpVMkZ1SUVaeVlXNWphWE5qYnpFWk1CY0dBMVVFQ2hNUWIzSm5NaTVsYzNWdVpXZHZMbU52YlRFY01Cb0dBMVVFCkF4TVRZMkV1YjNKbk1pNWxjM1Z1WldkdkxtTnZiVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUEKQlBma3pVM0E2eDMzQTFyem9Fb3VTVjhmdUJyRU9kblhobGJKdUJIcm1qNXlsbmFzL1RLWXR3THQ2V1dTekdsMwoxSm5iYXV0Mldxa0VlMUVsS2crQTV4U2piVEJyTUE0R0ExVWREd0VCL3dRRUF3SUJwakFkQmdOVkhTVUVGakFVCkJnZ3JCZ0VGQlFjREFnWUlLd1lCQlFVSEF3RXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QXBCZ05WSFE0RUlnUWcKWkhsNmErblRCYml0VU9UU0NKN2x0SFdndS9jTkVWV0hUMFIvbGZlRkYvd3dDZ1lJS29aSXpqMEVBd0lEUndBdwpSQUlnT2ZTcGRsWmY1eVhGa1hySlFPT0F0R2xtRWxPclRvMm9pQVhNVnczQkZkNENJQVljWjhVeEs3YUo3UmdQCjJjei9uUVRDZWsvZ1k1Z1p6NXpTNjBtc0xScHEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=, issuerPublicKey: CgJPVQoEUm9sZQoMRW5yb2xsbWVudElEChBSZXZvY2F0aW9uSGFuZGxlEkQKIG5Ux1pOGqdhxdZNXXMLTgjhn+9RjjbT6MQE9ST63s0IEiBO+nvhC7NBJtaRzDiQ0hrlipfqUP6uf0z6HgUd2L9x0xpECiByC2wbbF578jlkHX82sR+4FeAjQ7nbTiUQpjmmbqWE9xIgr/VguRnC4ZPM2owgCsLj/npmzXUDtwJb7+bH1uQ2sxsiRAogG15xhAeI8WRTQvXaG/BpUxvWU+LAvqS2+kbkhY9GMKoSICd6old9vBj0csnBNl0WG+hlhoExYjabZRCpipdL1brpIkQKIKrC2JKZk4NnxICmcOkQ3R37dwvc7RUhTb5kJgyjXdirEiCpuLrX+lThe3IYIiFO9SeZhJIUSvI8RqNUdNaGlUZmtCJECiBq2x37CEK1C5kzcqo/HKaJ3FPlkMS9sLv8epd7rDW00xIgotZFwKD/y6+mBahnM/rGKw7aMT4r/PQxl7cONo6vM5ciRAogZIjy9X2eIO9YjTHZsWW8jn9nv0BR0QWDnWoY3l9jKVsSIAxylDIS10iq/tUlXpSTllVo22DwGsQ7wwORPBr0DhoDKogBCiC3jSYjtP8VrXgtqZ6ADTJjpWz2HSg09thTRhhO45JfnhIgyp1wlQsJPGeJOxCFfXgWCw8YQ18hjNOhF8a+xBvG8PgaIAD0HUvs66/1/PlI1j0zCaj/2v+XVRRHaatRubfygqs4IiC8Gok5ZvCUwMD/psolXzmUDmB7YPZh1nr9jZwmScBs7jJECiCa+anLdJjYNyTesIaDj2A1W5GH1S/9Cf0Mo+R2dw6F1BIgQR4NdVpu4qOiDztDcZGiNK9K8csCYiowCw3/wQechqk6RAogZLvHGDzQMI7rg4fnCz7ucWIxx3sO/kK8pc5qdZBjP2ISIJabbIOfRdC2TCmGlKkJwnR/nNXkW7YkNXjbBZOIB4oHQiAWNcuepx/SIDAE/QGVhGzGZz7kQYcV51vOsCCmic53hUogDf4oj5DVox6CiCe+oD5JrceUgC7h2Rb9jlgLbeWtooBSIKcaZ2Ls/dqcgC+h4/qSVzKfcfnmDyPAiE5YP32OWqYh, issuerRevocationPublicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVFSGFwdmJRcGNHbm04VTUzM0prY2pSZk9HTXBJaEJ5NQpWbFA3b29XM0RXWU5tRVlmR3pWSXBTZ1Rhb3ZoYzI4ZlcwT1Q0K05Dclh5S0hjakZtWGh4Z0xxaktKTHdlZUl6CmJpVElJRWlXVTJNcXkzY0dNMGlkalpSbFNtTmk0UGx3Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
+2019-11-04 08:45:41,514 main INFO  HFCAClient:1542 - CA Version: 1.4.3
+org.hyperledger.fabric.sdk.NetworkConfig@48b67364
+2019-11-04 08:45:46,776 main INFO  Channel:1259 - Channel Channel{id: 1, name: foo} eventThread started shutdown: false  thread: null 
+Checking instantiated chaincode: cc-NetworkConfigTest-001, at version: 1, on peer: peer0.org1.esunego.com
+2019-11-04 08:45:47,692 main INFO  Channel:1259 - Channel Channel{id: 8, name: foo} eventThread started shutdown: false  thread: null 
 Running testUpdate1 - Channel foo
 Now query chaincode on channel foo for the current value of b
-Query payload of b from peer peer0.org1.example.com returned 999
-Query payload of b from peer peer1.org1.example.com returned 999
+Query payload of b from peer peer0.org1.esunego.com returned 999
+Query payload of b from peer peer1.org1.esunego.com returned 999
 Original value = 999
 sending transaction proposal to all peers with arguments: move(a,b,5)
-Successful transaction proposal response Txid: cfeebeb5ecba13da6d0882782a0572df7f8b2604759c7c2e86c5e4b2d0707b58 from peer peer0.org1.example.com
-Successful transaction proposal response Txid: cfeebeb5ecba13da6d0882782a0572df7f8b2604759c7c2e86c5e4b2d0707b58 from peer peer1.org1.example.com
+Successful transaction proposal response Txid: 6537e619ea878c341af0eacd346ae262625fcb25a1de57bd9bae02084a124fa2 from peer peer0.org1.esunego.com
+Successful transaction proposal response Txid: 6537e619ea878c341af0eacd346ae262625fcb25a1de57bd9bae02084a124fa2 from peer peer1.org1.esunego.com
 Received 2 transaction proposal responses. Successful+verified: 2 . Failed: 0
 Successfully received transaction proposal responses.
 Sending chaincode transaction(move a,b,5) to orderer.
 Now query chaincode on channel foo for the value of b expecting to see: 1004
 Now query chaincode on channel foo for the current value of b
-Query payload of b from peer peer0.org1.example.com returned 1004
-Query payload of b from peer peer1.org1.example.com returned 1004
+Query payload of b from peer peer0.org1.esunego.com returned 1004
+Query payload of b from peer peer1.org1.esunego.com returned 1004
 sending transaction proposal to all peers with arguments: move(b,a,5)
-Successful transaction proposal response Txid: 19ee71e5b8f3d3e6ddd65605afda14ecc6b8e32e3077bad82b02b12b950449ac from peer peer0.org1.example.com
-Successful transaction proposal response Txid: 19ee71e5b8f3d3e6ddd65605afda14ecc6b8e32e3077bad82b02b12b950449ac from peer peer1.org1.example.com
+Successful transaction proposal response Txid: 315febec1dc28c2725b7f63e103bd4c843f80f53d05dc5f6774629851dfd810f from peer peer0.org1.esunego.com
+Successful transaction proposal response Txid: 315febec1dc28c2725b7f63e103bd4c843f80f53d05dc5f6774629851dfd810f from peer peer1.org1.esunego.com
 Received 2 transaction proposal responses. Successful+verified: 2 . Failed: 0
 Successfully received transaction proposal responses.
 Sending chaincode transaction(move b,a,5) to orderer.
 Now query chaincode on channel foo for the value of b expecting to see: 999
 Now query chaincode on channel foo for the current value of b
-Query payload of b from peer peer0.org1.example.com returned 999
-Query payload of b from peer peer1.org1.example.com returned 999
+Query payload of b from peer peer0.org1.esunego.com returned 999
+Query payload of b from peer peer1.org1.esunego.com returned 999
 testUpdate1 - done
 That's all folks!
-2019-10-31 08:35:02,999 pool-4-thread-1 INFO  Channel:5988 - Channel foo eventThread shutting down. shutdown: true  thread: pool-4-thread-1 
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 39.593 sec - in org.hyperledger.fabric.sdkintegration.NetworkConfigIT
+2019-11-04 08:45:52,619 pool-3-thread-1 INFO  Channel:5988 - Channel foo eventThread shutting down. shutdown: true  thread: pool-3-thread-1 
 
-Results :
-
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-
-[INFO] 
-[INFO] --- jacoco-maven-plugin:0.8.2:report (post-unit-test) @ fabric-sdk-java ---
-[INFO] Loading execution data file D:\code\java\fabric-sdk-java\target\coverage-reports\jacoco-ut.exec
-[INFO] Analyzed bundle 'fabric-java-sdk' with 252 classes
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  01:29 min
-[INFO] Finished at: 2019-10-31T16:35:05+08:00
-[INFO] ------------------------------------------------------------------------
 
 ```
 
