@@ -70,11 +70,11 @@ channels:
     # operational decisions to share loads from applications among the orderers.  The values must
     # be "names" of orgs defined under "organizations/peers"
     orderers:
-      - orderer.example.com
+      - orderer.esunego.com
 
     # Required. list of peers from participating orgs
     peers:
-      peer0.org1.example.com:
+      peer0.org1.esunego.com:
         # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
         # have the chaincode installed. The app can also use this property to decide which peers
         # to send the chaincode install request. Default: true
@@ -94,7 +94,7 @@ channels:
         # Default: true
         eventSource: true
 
-      peer1.org1.example.com:
+      peer1.org1.esunego.com:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
@@ -116,8 +116,8 @@ organizations:
     mspid: Org1MSP
 
     peers:
-      - peer0.org1.example.com
-      - peer1.org1.example.com
+      - peer0.org1.esunego.com
+      - peer1.org1.esunego.com
 
     # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
     # network. Typically certificates provisioning is done in a separate process outside of the
@@ -135,7 +135,7 @@ organizations:
     # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
     # this route as an alternative when it exists.
     adminPrivateKey:
-      #path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/6b32e59640c594cf633ad8c64b5958ef7e5ba2a205cfeefd44a9e982ce624d93_sk
+      #path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.esunego.com/users/Admin@org1.esunego.com/msp/keystore/6b32e59640c594cf633ad8c64b5958ef7e5ba2a205cfeefd44a9e982ce624d93_sk
       pem: |
             -----BEGIN PRIVATE KEY-----
             MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgpANnM2zJ/oz7c31B
@@ -144,7 +144,7 @@ organizations:
             -----END PRIVATE KEY-----
 
     signedCert:
-      path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.esunego.com/users/Admin@org1.esunego.com/msp/signcerts/Admin@org1.esunego.com-cert.pem
       #pem: |
       #      -----BEGIN CERTIFICATE-----
       #      MIICGjCCAcCgAwIBAgIRAPDmqtljAyXFJ06ZnQjXqbMwCgYIKoZIzj0EAwIwczEL
@@ -169,7 +169,7 @@ organizations:
   Org2:
     mspid: Org2MSP
     peers:
-      - peer0.org2.example.com
+      - peer0.org2.esunego.com
     certificateAuthorities:
           - ca-org2
 
@@ -179,24 +179,24 @@ organizations:
 # SDK is implementation specific. Consult each SDK's documentation for its handling of orderers.
 #
 orderers:
-  orderer.example.com:
+  orderer.esunego.com:
     url: grpc://139.9.120.244:7050
 
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
     grpcOptions:
-#      ssl-target-name-override: orderer.example.com
+#      ssl-target-name-override: orderer.esunego.com
 #      sslProvider: openSSL
 #      negotiationType: TLS
-#      hostnameOverride: orderer.example.com
+#      hostnameOverride: orderer.esunego.com
       grpc-max-send-message-length: 15
       grpc.keepalive_time_ms: 360000
       grpc.keepalive_timeout_ms: 180000
       grpc.keepalive_without_calls: true
 
 
-    # src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/ordererOrganizations/example.com/tlsca
+    # src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/ordererOrganizations/esunego.com/tlsca
 #    tlsCACerts:
 #      pem: |
 #        -----BEGIN CERTIFICATE-----
@@ -219,7 +219,7 @@ orderers:
 # and event listener registration.
 #
 peers:
-  peer0.org1.example.com:
+  peer0.org1.esunego.com:
     # this URL is used to send endorsement and query requests
     url: grpc://139.9.120.244:7051
 
@@ -228,10 +228,10 @@ peers:
 
     grpcOptions:
       grpc.http2.keepalive_time: 15
-#      ssl-target-name-override: peer0.org1.example.com
+#      ssl-target-name-override: peer0.org1.esunego.com
 #      negotiationType: TLS
 #      sslProvider: openSSL
-#      hostnameOverride: peer0.org1.example.com
+#      hostnameOverride: peer0.org1.esunego.com
 #      # TODO: The following causes a NoSuchMethodException to be thrown when sending proposals to the peer...
 #      # grpc.NettyChannelBuilderOption.maxInboundMessageSize: 9000000
 #
@@ -254,34 +254,34 @@ peers:
 #          -----END CERTIFICATE-----
 
 
-  peer1.org1.example.com:
+  peer1.org1.esunego.com:
     url: grpc://139.9.120.244:7056
     eventUrl: grpc://139.9.120.244:7058
 
     grpcOptions:
       grpc.http2.keepalive_time: 15
-#      ssl-target-name-override: peer0.org1.example.com
+#      ssl-target-name-override: peer0.org1.esunego.com
 #      negotiationType: TLS
 #      sslProvider: openSSL
-#      hostnameOverride: peer1.org1.example.com
+#      hostnameOverride: peer1.org1.esunego.com
 
     tlsCACerts:
-      path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/server.crt
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.esunego.com/peers/peer1.org1.esunego.com/tls/server.crt
 
 
 
-  peer0.org2.example.com:
+  peer0.org2.esunego.com:
     url: grpc://139.9.127.140:8051
     eventUrl: grpc://139.9.127.140:8053
 #    grpcOptions:
-#      ssl-target-name-override: peer0.org2.example.com
+#      ssl-target-name-override: peer0.org2.esunego.com
 #      negotiationType: TLS
 #      grpc.NettyChannelBuilderOption.maxInboundMessageSize: 9000000
 #      sslProvider: openSSL
-#      hostnameOverride: peer0.org2.example.com
+#      hostnameOverride: peer0.org2.esunego.com
 #
 #    tlsCACerts:
-#      path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/server.crt
+#      path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org2.esunego.com/peers/peer0.org2.esunego.com/tls/server.crt
 
 #
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
@@ -310,7 +310,7 @@ certificateAuthorities:
     httpOptions:
       verify: true
     tlsCACerts:
-      path: peerOrganizations/org1.example.com/ca/org1.example.com-cert.pem
+      path: peerOrganizations/org1.esunego.com/ca/org1.esunego.com-cert.pem
 
     # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
     # needed to enroll and invoke new users.

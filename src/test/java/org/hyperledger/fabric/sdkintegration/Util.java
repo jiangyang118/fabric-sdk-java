@@ -95,7 +95,7 @@ class Util {
     }
 
     public static File findFileSk(File directory) {
-
+    	System.err.println(directory);
         File[] matches = directory.listFiles((dir, name) -> name.endsWith("_sk"));
 
         if (null == matches) {
