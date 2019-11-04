@@ -16,6 +16,9 @@ cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration
 # 2.  创建创世区块
 # 3.  修改运行的yaml文件中的配置
 # 4.  发送到salve服务器
+cd /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/e2e-2Orgs
+zip cry.zip  v1.3
+scp cry.zip root@139.9.127.140:/data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/e2e-2Orgs
 # 5.  启动网络，运行1个orderer；2个peer，1个ca；1个fabric-tools
 docker-compose -f 244.yaml up -d
 
