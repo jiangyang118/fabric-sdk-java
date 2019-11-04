@@ -1,6 +1,3 @@
-
-
-
 # Generates Org certs using cryptogen tool
 function generateCerts() {
   which cryptogen
@@ -32,5 +29,3 @@ function generateCerts() {
 
 export PATH=${PWD}/../bin:${PWD}:$PATH
 generateCerts
-rm -rf ../e2e-2Orgs/v1.3/
-mv crypto-config ../e2e-2Orgs/v1.3/

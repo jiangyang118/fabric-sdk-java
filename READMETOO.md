@@ -10,15 +10,24 @@ cd /data/code/java/fabric-1.4.0
 git clone https://github.com/jiangyang118/fabric-sdk-java.git
 cd fabric-sdk-java
 git checkout manu-coinfig
-cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration
+cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/bin
+chmod +x *
+
+cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/shell
+chmod +x *
 
 # 1.  创建证书
+./generateCerts.sh 
+
 # 2.  创建创世区块
-# 3.  修改运行的yaml文件中的配置
-# 4.  发送到salve服务器
-cd /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/e2e-2Orgs
-zip cry.zip  v1.3
-scp cry.zip root@139.9.127.140:/data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/e2e-2Orgs
+./generateChannelArtifacts.sh 
+
+# 3.  修改运行的244.yaml和140.yaml文件中的配置
+./replacePrivateKey.sh 
+
+# 4.  发送140.yaml到salve服务器
+scp 140.yaml root@139.9.127.140:/data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/
+
 # 5.  启动网络，运行1个orderer；2个peer，1个ca；1个fabric-tools
 docker-compose -f 244.yaml up -d
 
@@ -40,10 +49,8 @@ cd fabric-sdk-java
 git checkout manu-coinfig
 cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration
 
-# 1.  修改运行的yaml文件中的配置
 
-
-# 2.  启动网络，运行1个orderer；2个peer，1个ca；1个fabric-tools
+# 1.  启动网络，运行2个peer，1个ca 
 docker-compose -f 140.yaml up -d
 
 #日志如下
@@ -56,8 +63,9 @@ cc1783271568        hyperledger/fabric-ca:1.4                                   
 
 ### 3. 在本地运行end2endIT单元测试
 ```shell
+# 1. 将第一步生成的crypto-config文件夹、 bar.tx、 foo.tx、orderer.block下载至本地，替换\fabric-sdk-java\src\test\fixture\sdkintegration\e2e-2Orgs\v1.3文件夹内容
 
-#手动替换如下路径的sk文件
+# 2. 手动替换\fabric-sdk-java\src\test\fixture\sdkintegration\network_configs\network-config.yaml文件中如下路径的sk文件
 #path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.esunego.com/users/Admin@org1.esunego.com/msp/keystore/8a48ddb8cb4cf9b376730f9f6bdb9d50dcc103b1cc9049c54f83db907849791a_sk
      
      

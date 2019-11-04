@@ -37,12 +37,12 @@ function generateChannelArtifacts() {
     exit 1
   fi
   echo
-  echo "#################################################################"
-  echo "### Generating channel configuration transaction 'channel.tx' ###"
-  echo "#################################################################"
+  echo "##########################################################################"
+  echo "### Generating channel configuration transaction 'bar.tx' and 'foo.tx' ###"
+  echo "##########################################################################"
   set -x
-  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/bar.tx -channelID bar
-  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/foo.tx -channelID foo
+  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./bar.tx -channelID bar
+  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./foo.tx -channelID foo
   res=$?
   set +x
   if [ $res -ne 0 ]; then
@@ -55,7 +55,3 @@ function generateChannelArtifacts() {
 
 export PATH=${PWD}/../bin:${PWD}:$PATH
 generateChannelArtifacts
-
-mv orderer.block ../e2e-2Orgs/v1.3/
-mv bar.tx ../e2e-2Orgs/v1.3/
-mv foo.tx ../e2e-2Orgs/v1.3/
