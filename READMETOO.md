@@ -9,7 +9,7 @@
 cd /data/code/java/fabric-1.4.0
 git clone https://github.com/jiangyang118/fabric-sdk-java.git
 cd fabric-sdk-java
-git checkout manu-coinfig
+git checkout -b remotes/origin/manu-config
 cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/bin
 chmod +x *
 
@@ -46,7 +46,7 @@ e1dd21938f1c        hyperledger/fabric-peer:1.4                                 
 cd /data/code/java/fabric-1.4.0
 git clone https://github.com/jiangyang118/fabric-sdk-java.git
 cd fabric-sdk-java
-git checkout manu-coinfig
+git checkout -b remotes/origin/manu-config
 cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration
 
 
