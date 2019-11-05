@@ -14,7 +14,17 @@
 
 package org.hyperledger.fabric.sdkintegration;
 
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hyperledger.fabric.sdk.testutils.TestUtils.getMockUser;
+import static org.hyperledger.fabric.sdk.testutils.TestUtils.resetConfig;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -26,13 +36,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.codec.binary.Hex;
 import org.hyperledger.fabric.protos.peer.Query.ChaincodeInfo;
 import org.hyperledger.fabric.sdk.BlockEvent;
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
+import org.hyperledger.fabric.sdk.BlockInfo;
+import org.hyperledger.fabric.sdk.BlockchainInfo;
 import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
 import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.ChaincodeResponse.Status;
 import org.hyperledger.fabric.sdk.Channel;
+import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.InstallProposalRequest;
 import org.hyperledger.fabric.sdk.InstantiateProposalRequest;
@@ -58,15 +72,6 @@ import org.hyperledger.fabric_ca.sdk.HFCAInfo;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hyperledger.fabric.sdk.testutils.TestUtils.getMockUser;
-import static org.hyperledger.fabric.sdk.testutils.TestUtils.resetConfig;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Integration test for the Network Configuration YAML (/JSON) file
@@ -181,6 +186,67 @@ public class NetworkConfigIT {
 		orgRegisteredUsers.put(org.getName(), mockuser);
 		System.err.println(networkConfig);
 		deployChaincodeIfRequired();
+
+//		user = getFabricUser(org, caInfo);
+//		user = registerFabricUser(org, caInfo, userName);
+	}
+
+	private static FabricUser user;
+	private static String userName = "m1";
+	private static String secret = "SuBbYLhFbxEv";
+
+	private static FabricUser getFabricUser(NetworkConfig.OrgInfo clientOrg, NetworkConfig.CAInfo caInfo)
+			throws Exception {
+		HFCAClient hfcaClient = HFCAClient.createNewInstance(caInfo);
+		HFCAInfo cainfo = hfcaClient.info();
+		lineBreak();
+		out("CA name: " + cainfo.getCAName());
+		out("CA version: " + cainfo.getVersion());
+
+		out("Going to enroll user: " + userName);
+		Enrollment enrollment = hfcaClient.enroll(userName, secret);
+
+		String username = userName;
+
+		FabricUser user = new FabricUser();
+		user.setMspId(clientOrg.getMspId());
+		user.setName(username);
+		user.setOrganization(clientOrg.getName());
+		user.setEnrollment(enrollment);
+		out("Enroll user: " + userName + " successfully.");
+		return user;
+	}
+
+	private static void lineBreak() {
+		System.err.println("=============================================================");
+	}
+
+	private static FabricUser registerFabricUser(NetworkConfig.OrgInfo clientOrg, NetworkConfig.CAInfo caInfo,
+			String username) throws Exception {
+		HFCAClient hfcaClient = HFCAClient.createNewInstance(caInfo);
+		HFCAInfo cainfo = hfcaClient.info();
+		lineBreak();
+		out("CA name: " + cainfo.getCAName());
+		out("CA version: " + cainfo.getVersion());
+
+		out("Going to enroll user: " + username);
+
+		Collection<UserInfo> registrars = caInfo.getRegistrars();
+		assertTrue(!registrars.isEmpty());
+		UserInfo registrar = registrars.iterator().next();
+		registrar.setEnrollment(hfcaClient.enroll(registrar.getName(), registrar.getEnrollSecret()));
+		RegistrationRequest rr = new RegistrationRequest(username, "org1.department1");
+		String secret = hfcaClient.register(rr, registrar);
+		System.err.println(secret);
+
+		// Persistence is not part of SDK.
+		FabricUser user = new FabricUser();
+		user.setMspId(clientOrg.getMspId());
+		user.setName(username);
+		user.setOrganization(clientOrg.getName());
+		user.setEnrollment(hfcaClient.enroll(username, secret));
+		out("Enroll user: " + username + " successfully.");
+		return user;
 	}
 
 	// Determines whether or not the chaincode has been deployed and deploys it if
@@ -190,6 +256,9 @@ public class NetworkConfigIT {
 		////////////////////////////
 		// Setup client
 		HFClient client = getTheClient();
+//		HFClient client = HFClient.createNewInstance();
+//		client.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
+//		client.setUserContext(user);
 
 		Channel channel = constructChannel(client, FOO_CHANNEL_NAME);
 
@@ -288,10 +357,31 @@ public class NetworkConfigIT {
 
 		}).get(testConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
 
+		printChannelInfo(client, channel);
+		
 		channel.shutdown(true); // Force channel to shutdown clean up resources.
-
 		out("testUpdate1 - done");
 		out("That's all folks!");
+	}
+
+	private static void printChannelInfo(HFClient client, Channel channel)
+			throws ProposalException, InvalidArgumentException, IOException {
+		lineBreak();
+		BlockchainInfo channelInfo = channel.queryBlockchainInfo();
+
+		System.err.println("Channel height: " + channelInfo.getHeight());
+		for (long current = channelInfo.getHeight() - 1; current > -1; --current) {
+			BlockInfo returnedBlock = channel.queryBlockByNumber(current);
+			final long blockNumber = returnedBlock.getBlockNumber();
+			System.err.println(String.format("Block #%d has previous hash id: %s", blockNumber,
+					Hex.encodeHexString(returnedBlock.getPreviousHash())));
+			System.err.println(String.format("Block #%d has data hash: %s", blockNumber,
+					Hex.encodeHexString(returnedBlock.getDataHash())));
+			System.err.println(String.format("Block #%d has calculated block hash is %s", blockNumber,
+					Hex.encodeHexString(SDKUtils.calculateBlockHash(client, blockNumber,
+							returnedBlock.getPreviousHash(), returnedBlock.getDataHash()))));
+		}
+
 	}
 
 	private static void queryChaincodeForExpectedValue(HFClient client, Channel channel, final String expect,
