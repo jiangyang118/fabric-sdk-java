@@ -1,6 +1,6 @@
 
 ## 步骤
-以下步骤实现自定义域名，创建证书、创建创世区块，启动两台虚机运行fabric1.4.0网络，并执行End2endIT和NetworkConfigIT集成测试。
+以下步骤在manu-config分支的基础上，实现kafka排序的orderer节点。
 
 将139.9.120.244定义为master华为云虚机；139.9.127.140定义为slave华为云虚机。
 
@@ -9,7 +9,7 @@
 cd /data/code/java/fabric-1.4.0
 git clone https://github.com/jiangyang118/fabric-sdk-java.git
 cd fabric-sdk-java
-git checkout -b remotes/origin/manu-config
+git checkout -b remotes/origin/kafka
 cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/bin
 chmod +x *
 
@@ -31,14 +31,19 @@ chmod +x *
 # 5.  启动网络，运行1个orderer；2个peer，1个ca；1个fabric-tools
 docker-compose -f 244.yaml up -d
 
-#日志如下
-[root@ecs-1d88-0001 sdkintegration]# docker ps -a
-CONTAINER ID        IMAGE                                                                                                         COMMAND                  CREATED             STATUS                      PORTS                    NAMES
-723fbe7fbbca        hyperledger/fabric-peer:1.4                                                                                   "peer node start"        5 seconds ago       Up 3 seconds                0.0.0.0:7056->7056/tcp   peer1.org1.example.com
-e1dd21938f1c        hyperledger/fabric-peer:1.4                                                                                   "peer node start"        5 seconds ago       Up 4 seconds                0.0.0.0:7051->7051/tcp   peer0.org1.example.com
-656215da94b2        hyperledger/fabric-orderer:1.4                                                                                "orderer"                6 seconds ago       Up 4 seconds                0.0.0.0:7050->7050/tcp   orderer.example.com
-06109ff827de        hyperledger/fabric-tools:1.4                                                                                  "/usr/local/bin/conf…"   6 seconds ago       Up 4 seconds                0.0.0.0:7059->7059/tcp   configtxlator
-5b105fc22785        hyperledger/fabric-ca:1.4                                                                                     "sh -c 'mkdir -p /et…"   6 seconds ago       Up 4 seconds                0.0.0.0:7054->7054/tcp   ca_peerOrg1
+#日志如下，其中dc9c2784fa12和d75a3d0cd074是运行后的链码
+
+[root@ecs-1d88-0001 fabric-sdk-java]# docker ps -a
+CONTAINER ID        IMAGE                                                                                                         COMMAND                  CREATED             STATUS              PORTS                          NAMES
+dc9c2784fa12        dev-peer0.org1.esunego.com-example_cc_go-1-b150e8963ab3fe27fa119ed8e90ea18d06d16ae16a3b1c2381cb22ac9488a426   "chaincode -peer.add…"   3 minutes ago       Up 3 minutes                                       dev-peer0.org1.esunego.com-example_cc_go-1
+d75a3d0cd074        dev-peer1.org1.esunego.com-example_cc_go-1-ba6806bfa342770bc8fbf597cdf80ef6a7d1435e68cc71f0aed25245cb3f0611   "chaincode -peer.add…"   3 minutes ago       Up 3 minutes                                       dev-peer1.org1.esunego.com-example_cc_go-1
+6cb165bcb9c8        hyperledger/fabric-peer:1.4                                                                                   "peer node start"        17 minutes ago      Up 17 minutes       0.0.0.0:7056->7056/tcp         peer1.org1.esunego.com
+1817a0e24ce3        hyperledger/fabric-peer:1.4                                                                                   "peer node start"        17 minutes ago      Up 17 minutes       0.0.0.0:7051->7051/tcp         peer0.org1.esunego.com
+c1e5572a847c        hyperledger/fabric-kafka:latest                                                                               "/docker-entrypoint.…"   17 minutes ago      Up 17 minutes       9092-9093/tcp                  kafka.esunego.com
+c42e8877929e        hyperledger/fabric-orderer:1.4                                                                                "orderer"                17 minutes ago      Up 17 minutes       0.0.0.0:7050->7050/tcp         orderer.esunego.com
+d95dcceb9797        hyperledger/fabric-zookeeper:latest                                                                           "/docker-entrypoint.…"   17 minutes ago      Up 17 minutes       2181/tcp, 2888/tcp, 3888/tcp   zookeeper.esunego.com
+438bf8203da7        hyperledger/fabric-tools:1.4                                                                                  "/usr/local/bin/conf…"   17 minutes ago      Up 17 minutes       0.0.0.0:7059->7059/tcp         configtxlator
+6575022d7362        hyperledger/fabric-ca:1.4                                                                                     "sh -c 'mkdir -p /et…"   17 minutes ago      Up 17 minutes       0.0.0.0:7054->7054/tcp         ca_peerOrg1                                                                                 "sh -c 'mkdir -p /et…"   6 seconds ago       Up 4 seconds                0.0.0.0:7054->7054/tcp   ca_peerOrg1
 ```
 
 ### 2. 在slave拉取fabric-sdk-java 
@@ -46,7 +51,7 @@ e1dd21938f1c        hyperledger/fabric-peer:1.4                                 
 cd /data/code/java/fabric-1.4.0
 git clone https://github.com/jiangyang118/fabric-sdk-java.git
 cd fabric-sdk-java
-git checkout -b remotes/origin/manu-config
+git checkout -b remotes/origin/kafka
 cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration
 
 # 1.  移动证书和创世区块到指定文件夹v1.3

@@ -134,7 +134,7 @@ services:
 
   zookeeper.esunego.com:
     container_name: zookeeper.esunego.com
-    image: hyperledger/fabric-zookeeper:$IMAGE_TAG
+    image: hyperledger/fabric-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
@@ -143,7 +143,7 @@ services:
 
   kafka.esunego.com:
     container_name: kafka.esunego.com
-    image: hyperledger/fabric-kafka:$IMAGE_TAG
+    image: hyperledger/fabric-kafka:latest
     depends_on:
     - zookeeper.esunego.com
     environment:
