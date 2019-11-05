@@ -5,6 +5,9 @@
 #
 version: '2'
 
+networks:
+  esunego:
+  
 services:
   ca0:
     image: hyperledger/fabric-ca${IMAGE_TAG_FABRIC_CA}
@@ -25,7 +28,9 @@ services:
       - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.esunego.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
       - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org3.esunego.com/msp/:/tmp/msp:ro
     container_name: ca_peerOrg1
-
+    networks:
+      - esunego
+      
   orderer.esunego.com:
     container_name: orderer.esunego.com
     image: hyperledger/fabric-orderer${IMAGE_TAG_FABRIC}
@@ -48,6 +53,11 @@ services:
       - GRPC_TRACE=all=true,
       - GRPC_VERBOSITY=debug
       - ORDERER_GENERAL_AUTHENTICATION_TIMEWINDOW=3600s #Not for production -- remove.
+      - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+      - ORDERER_KAFKA_VERBOSE=true
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/etc/hyperledger/msp/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/etc/hyperledger/msp/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/etc/hyperledger/msp/orderer/tls/ca.crt]
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: orderer
     volumes:
@@ -58,6 +68,8 @@ services:
 
     ports:
       - 7050:7050
+    networks:
+      - esunego
 
   peer0.org1.esunego.com:
     container_name: peer0.org1.esunego.com
@@ -82,7 +94,9 @@ services:
       - 7051:7051
     depends_on:
       - orderer.esunego.com
-
+    networks:
+      - esunego
+      
   peer1.org1.esunego.com:
     container_name: peer1.org1.esunego.com
     extends:
@@ -106,9 +120,43 @@ services:
     depends_on:
        - orderer.esunego.com
        - peer0.org1.esunego.com
+    networks:
+      - esunego
   configtxlator:
       image: hyperledger/fabric-tools${IMAGE_TAG_FABRIC}
       ports:
         - "7059:7059"
       command: /usr/local/bin/configtxlator start
       container_name: configtxlator
+      networks:
+      - esunego
+
+
+  zookeeper.esunego.com:
+    container_name: zookeeper.esunego.com
+    image: hyperledger/fabric-zookeeper:$IMAGE_TAG
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+    - esunego
+
+  kafka.esunego.com:
+    container_name: kafka.esunego.com
+    image: hyperledger/fabric-kafka:$IMAGE_TAG
+    depends_on:
+    - zookeeper.esunego.com
+    environment:
+      - GODEBUG=netdns=go
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper.esunego.com:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka.esunego.com:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_MESSAGE_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
+      - KAFKA_REPLICA_FETCH_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
+      - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
+      - KAFKA_LOG_RETENTION_MS=-1
+      - KAFKA_MIN_INSYNC_REPLICAS=1
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=1
+    networks:
+    - esunego

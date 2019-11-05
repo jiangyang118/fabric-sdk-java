@@ -432,4 +432,7 @@ That's all folks!
 #停止命令
 docker-compose  -f 244.yaml down
 docker-compose  -f 140.yaml down
+
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
 ```

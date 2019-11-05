@@ -24,6 +24,8 @@ services:
       - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org2.esunego.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
       - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org4.esunego.com/msp/:/tmp/msp:ro
     container_name: ca_peerOrg2
+    networks:
+      - esunego
 
   peer0.org2.esunego.com:
     container_name: peer0.org2.esunego.com
@@ -48,6 +50,8 @@ services:
       - 8051:8051
     extra_hosts:
      - "orderer.esunego.com:139.9.120.244"
+    networks:
+      - esunego
 
   peer1.org2.esunego.com:
     container_name: peer1.org2.esunego.com
@@ -73,3 +77,5 @@ services:
        - peer0.org2.esunego.com
     extra_hosts:
      - "orderer.esunego.com:139.9.120.244"
+    networks:
+      - esunego
