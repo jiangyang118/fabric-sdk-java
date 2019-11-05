@@ -135,7 +135,7 @@ organizations:
     # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
     # this route as an alternative when it exists.
     adminPrivateKey:
-      path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.esunego.com/users/Admin@org1.esunego.com/msp/keystore/8a48ddb8cb4cf9b376730f9f6bdb9d50dcc103b1cc9049c54f83db907849791a_sk
+      path: src/test/fixture/sdkintegration/e2e-2Orgs/v1.3/crypto-config/peerOrganizations/org1.esunego.com/users/Admin@org1.esunego.com/msp/keystore/12c703973c42844289b985d651c3f9aa9a83976f2735d18b9c2018c05a0d539d_sk
       #pem: |
       #      -----BEGIN PRIVATE KEY-----
       #      MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgpANnM2zJ/oz7c31B

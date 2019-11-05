@@ -12,9 +12,9 @@ services:
       - GODEBUG=netdns=go
       - FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca0
-      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.esunego.com-cert.pem
       - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA0_PRIVATE_KEY
-      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.esunego.com-cert.pem
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA0_PRIVATE_KEY
       - FABRIC_CA_SERVER_REGISTRY_MAXENROLLMENTS=-1
     ports:
@@ -22,12 +22,12 @@ services:
     command: sh -c 'mkdir -p /etc/hyperledger/fabric-ca-server;cp -R /tmp/msp /etc/hyperledger/fabric-ca-server; mv /etc/hyperledger/fabric-ca-server/msp/*PublicKey /etc/hyperledger/fabric-ca-server; fabric-ca-server start -b admin:adminpw ${V11_IDENTITIES_ALLOWREMOVE} ${V11_AFFILIATIONS_ALLOWREMOVE} ${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_CA_TLS} -d'
 
     volumes:
-      - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
-      - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org3.example.com/msp/:/tmp/msp:ro
+      - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.esunego.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
+      - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org3.esunego.com/msp/:/tmp/msp:ro
     container_name: ca_peerOrg1
 
-  orderer.example.com:
-    container_name: orderer.example.com
+  orderer.esunego.com:
+    container_name: orderer.esunego.com
     image: hyperledger/fabric-orderer${IMAGE_TAG_FABRIC}
     environment:
       - GODEBUG=netdns=go
@@ -44,7 +44,7 @@ services:
       - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/msp/orderer/tls/server.key
       - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/msp/orderer/tls/server.crt
       - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/msp/orderer/tls/ca.crt]
-      - ORDERER_GENERAL_TLS_CLIENTROOTCAS=[/etc/hyperledger/msp/peerOrg1/msp/tlscacerts/tlsca.org1.example.com-cert.pem, /etc/hyperledger/msp/peerOrg2/msp/tlscacerts/tlsca.org2.example.com-cert.pem]
+      - ORDERER_GENERAL_TLS_CLIENTROOTCAS=[/etc/hyperledger/msp/peerOrg1/msp/tlscacerts/tlsca.org1.esunego.com-cert.pem, /etc/hyperledger/msp/peerOrg2/msp/tlscacerts/tlsca.org2.esunego.com-cert.pem]
       - GRPC_TRACE=all=true,
       - GRPC_VERBOSITY=debug
       - ORDERER_GENERAL_AUTHENTICATION_TIMEWINDOW=3600s #Not for production -- remove.
@@ -52,60 +52,60 @@ services:
     command: orderer
     volumes:
      - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}:/etc/hyperledger/configtx:ro
-     - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/:/etc/hyperledger/msp/orderer:ro
-     - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/:/etc/hyperledger/msp/peerOrg1:ro
-     - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/:/etc/hyperledger/msp/peerOrg2:ro
+     - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/ordererOrganizations/esunego.com/orderers/orderer.esunego.com/:/etc/hyperledger/msp/orderer:ro
+     - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.esunego.com/peers/peer0.org1.esunego.com/:/etc/hyperledger/msp/peerOrg1:ro
+     - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org2.esunego.com/peers/peer0.org2.esunego.com/:/etc/hyperledger/msp/peerOrg2:ro
 
     ports:
       - 7050:7050
 
-  peer0.org1.example.com:
-    container_name: peer0.org1.example.com
+  peer0.org1.esunego.com:
+    container_name: peer0.org1.esunego.com
     extends:
       file: peer-base/peer-base.yaml
       service: peer-base
     environment:
       - GODEBUG=netdns=go
-      - CORE_PEER_ID=peer0.org1.example.com
-      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
+      - CORE_PEER_ID=peer0.org1.esunego.com
+      - CORE_PEER_ADDRESS=peer0.org1.esunego.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.esunego.com:7051
  #     - CORE_PEER_GOSSIP_ORGLEADER=true
       - CORE_PEER_LOCALMSPID=Org1MSP
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.esunego.com:7051
 
-#      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/msp/peer/msp/cacerts/ca.org1.example.com-cert.pem
-      - CORE_PEER_TLS_CLIENTROOTCAS_FILES=/etc/hyperledger/msp/peer/msp/tlscacerts/tlsca.org1.example.com-cert.pem
+#      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/msp/peer/msp/cacerts/ca.org1.esunego.com-cert.pem
+      - CORE_PEER_TLS_CLIENTROOTCAS_FILES=/etc/hyperledger/msp/peer/msp/tlscacerts/tlsca.org1.esunego.com-cert.pem
     volumes:
       - /var/run/:/host/var/run/
-      - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/:/etc/hyperledger/msp/peer:ro
+      - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.esunego.com/peers/peer0.org1.esunego.com/:/etc/hyperledger/msp/peer:ro
     ports:
       - 7051:7051
     depends_on:
-      - orderer.example.com
+      - orderer.esunego.com
 
-  peer1.org1.example.com:
-    container_name: peer1.org1.example.com
+  peer1.org1.esunego.com:
+    container_name: peer1.org1.esunego.com
     extends:
       file: peer-base/peer-base.yaml
       service: peer-base
     environment:
       - GODEBUG=netdns=go
-      - CORE_PEER_ID=peer1.org1.example.com
-      - CORE_PEER_ADDRESS=peer1.org1.example.com:7056
-      - CORE_PEER_LISTENADDRESS=peer1.org1.example.com:7056
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.example.com:7056
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051
+      - CORE_PEER_ID=peer1.org1.esunego.com
+      - CORE_PEER_ADDRESS=peer1.org1.esunego.com:7056
+      - CORE_PEER_LISTENADDRESS=peer1.org1.esunego.com:7056
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.esunego.com:7056
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.esunego.com:7051
       - CORE_PEER_LOCALMSPID=Org1MSP
-#      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/msp/peer/msp/cacerts/ca.org1.example.com-cert.pem
-      - CORE_PEER_TLS_CLIENTROOTCAS_FILES=/etc/hyperledger/msp/peer/msp/tlscacerts/tlsca.org1.example.com-cert.pem
+#      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/msp/peer/msp/cacerts/ca.org1.esunego.com-cert.pem
+      - CORE_PEER_TLS_CLIENTROOTCAS_FILES=/etc/hyperledger/msp/peer/msp/tlscacerts/tlsca.org1.esunego.com-cert.pem
     volumes:
          - /var/run/:/host/var/run/
-         - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/:/etc/hyperledger/msp/peer:ro
+         - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.esunego.com/peers/peer1.org1.esunego.com/:/etc/hyperledger/msp/peer:ro
     ports:
        - 7056:7056
     depends_on:
-       - orderer.example.com
-       - peer0.org1.example.com
+       - orderer.esunego.com
+       - peer0.org1.esunego.com
   configtxlator:
       image: hyperledger/fabric-tools${IMAGE_TAG_FABRIC}
       ports:

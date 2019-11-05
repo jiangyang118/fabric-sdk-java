@@ -25,8 +25,8 @@ chmod +x *
 # 3.  修改运行的244.yaml和140.yaml文件中的配置
 ./replacePrivateKey.sh 
 
-# 4.  发送140.yaml到salve服务器
-scp 140.yaml root@139.9.127.140:/data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration/
+# 4.  移动证书和创世区块到指定文件夹v1.3，并发送证书和创世区块、140.yaml到salve服务器
+./moveConfig244.sh 
 
 # 5.  启动网络，运行1个orderer；2个peer，1个ca；1个fabric-tools
 docker-compose -f 244.yaml up -d
@@ -49,8 +49,10 @@ cd fabric-sdk-java
 git checkout -b remotes/origin/manu-config
 cd  /data/code/java/fabric-1.4.0/fabric-sdk-java/src/test/fixture/sdkintegration
 
+# 1.  移动证书和创世区块到指定文件夹v1.3
+./moveConfig140.sh 
 
-# 1.  启动网络，运行2个peer，1个ca 
+# 2.  启动网络，运行2个peer，1个ca 
 docker-compose -f 140.yaml up -d
 
 #日志如下
