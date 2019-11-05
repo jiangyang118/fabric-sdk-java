@@ -430,5 +430,6 @@ That's all folks!
 ### 5. 停止master和slave机器上的docker
 ```shell
 #停止命令
-docker-compose down
+docker-compose  -f 244.yaml down
+docker-compose  -f 140.yaml down
 ```
