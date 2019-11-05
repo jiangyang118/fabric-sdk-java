@@ -1,5 +1,5 @@
 # default consensus type
-CONSENSUS_TYPE="solo"
+CONSENSUS_TYPE="kafka"
 # system channel name defaults to "byfn-sys-channel"
 SYS_CHANNEL="byfn-sys-channel"
 
